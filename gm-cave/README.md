@@ -30,10 +30,15 @@
 
 ## 🚀 실행 방법
 
+### 웹에서 바로 보기
+- **GitHub Pages:** https://durume.github.io/GM/gm-cave/
+- **GitHub 저장소:** https://github.com/durume/GM/tree/main/gm-cave
+
+### 로컬에서 실행
 1. 프로젝트 클론
 ```bash
-git clone https://github.com/[username]/gm-cave.git
-cd gm-cave
+git clone https://github.com/durume/GM.git
+cd GM/gm-cave
 ```
 
 2. 웹 브라우저에서 `index.html` 파일 실행
