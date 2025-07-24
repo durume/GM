@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>파란두루미 주식회사: 디지털 포용 사회를 위한 청사진</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8fafc;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .kpi-card {
+            background-color: #005f73;
+            color: white;
+        }
+        .flow-arrow::after {
+            content: '▼';
+            font-size: 2rem;
+            color: #0a9396;
+            text-align: center;
+            display: block;
+            margin: 0.5rem 0;
+        }
+        .flow-arrow-horizontal {
+            position: relative;
+            flex-grow: 1;
+            height: 2px;
+            background-color: #0a9396;
+            margin: 0 1rem;
+        }
+        .flow-arrow-horizontal::after {
+            content: '▶';
+            position: absolute;
+            right: -1rem;
+            top: -0.85rem;
+            font-size: 1.5rem;
+            color: #0a9396;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-gray-800">
+
+    <header class="bg-white shadow-md sticky top-0 z-10">
+        <div class="container mx-auto px-6 py-4">
+            <h1 class="text-2xl md:text-3xl font-bold text-[#005f73]">파란두루미 주식회사</h1>
+            <p class="text-md text-[#0a9396]">디지털 포용 사회를 향한 청사진</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+        
+        <section id="intro" class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-extrabold mb-4 text-[#005f73]">잠자는 공공자산을 <span class="text-[#ee9b00]">우리 동네 디지털 놀이터</span>로</h2>
+            <p class="max-w-3xl mx-auto text-lg text-gray-600">
+                파란두루미는 전국에 방치된 작은도서관에 최신 AI와 XR 기술을 보급하여 모든 주민이 디지털 격차 없이 미래 기술을 배우고 체험하는 혁신적인 사회적 기업입니다.
+            </p>
+        </section>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+            <div class="bg-white rounded-lg shadow-lg p-6 flex flex-col justify-center items-center md:col-span-2">
+                <h3 class="text-2xl font-bold text-center mb-4 text-[#bb3e03]">우리가 마주한 두 가지 사회 문제</h3>
+                <p class="text-center text-gray-600 mb-6 max-w-4xl">전국의 귀중한 공공자산이 잠재력을 잃어가고 있으며, 기술 발전은 새로운 정보 불평등을 낳고 있습니다. 파란두루미는 이 두 문제를 동시에 해결하고자 합니다.</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h4 class="text-xl font-bold text-center mb-2 text-[#ca6702]">문제 1: 잠재력을 잃은 작은도서관</h4>
+                <p class="text-center text-gray-600 mb-4">전국 작은도서관의 상당수가 운영 미흡 상태로 방치되어 있습니다.</p>
+                <div class="chart-container h-64 md:h-72">
+                    <canvas id="libraryStatusChart"></canvas>
+                </div>
+                <p class="text-center font-bold text-3xl text-[#ca6702] mt-4">45.9%</p>
+                <p class="text-center text-gray-500">운영 미흡 상태</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h4 class="text-xl font-bold text-center mb-2 text-[#ca6702]">문제 2: 심화되는 디지털 격차</h4>
+                <p class="text-center text-gray-600 mb-4">AI, XR 기술의 발전 속에서 정보 취약계층은 점점 더 소외되고 있습니다.</p>
+                <div class="flex justify-around items-center h-72 text-6xl">
+                    <div class="text-center">
+                        <span class="animate-pulse">💻</span>
+                        <p class="text-lg font-semibold mt-4">기술 발전</p>
+                    </div>
+                    <div class="text-center text-gray-400">
+                        <span class="animate-pulse">❓</span>
+                        <p class="text-lg font-semibold mt-4">정보 소외</p>
+                    </div>
+                </div>
+                 <p class="text-center font-bold text-lg text-[#ca6702] mt-4">새로운 불평등 발생</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6 md:col-span-2">
+                <h3 class="text-2xl font-bold text-center mb-4 text-[#0a9396]">파란두루미의 혁신적인 해법: 비용 효율적인 디지털 교육</h3>
+                <p class="text-center text-gray-600 mb-6">최신 기술 교육을 민간 기관 대비 30~50% 저렴한 비용으로 제공하여 경제적 장벽을 허물고 누구나 최고 수준의 교육을 누릴 수 있도록 합니다.</p>
+                <div class="chart-container h-80">
+                    <canvas id="costComparisonChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6 md:col-span-2">
+                <h3 class="text-2xl font-bold text-center mb-4 text-[#005f73]">3년의 성장 로드맵: 측정 가능한 사회적 임팩트</h3>
+                <p class="text-center text-gray-600 mb-6">광명시를 시작으로, 3년 내에 구체적이고 측정 가능한 목표를 달성하여 지역 사회에 실질적인 변화를 만들겠습니다.</p>
+                <div class="chart-container h-80">
+                    <canvas id="growthRoadmapChart"></canvas>
+                </div>
+            </div>
+
+            <div class="kpi-card rounded-lg shadow-lg p-6 text-center">
+                <h4 class="text-xl font-bold mb-2 text-[#94d2bd]">디지털 허브 전환</h4>
+                <p class="text-5xl font-extrabold text-white">50<span class="text-2xl ml-1">개소</span></p>
+                <p class="text-[#e9d8a6] mt-2">광명시 작은도서관</p>
+            </div>
+
+            <div class="kpi-card rounded-lg shadow-lg p-6 text-center">
+                <h4 class="text-xl font-bold mb-2 text-[#94d2bd]">누적 교육 참여자</h4>
+                <p class="text-5xl font-extrabold text-white">1,000<span class="text-2xl ml-1">명+</span></p>
+                <p class="text-[#e9d8a6] mt-2">디지털 미래 인재</p>
+            </div>
+
+            <div class="kpi-card rounded-lg shadow-lg p-6 text-center md:col-span-2">
+                <h4 class="text-xl font-bold mb-2 text-[#94d2bd]">지역 일자리 창출</h4>
+                <p class="text-5xl font-extrabold text-white">50<span class="text-2xl ml-1">명</span></p>
+                <p class="text-[#e9d8a6] mt-2">지역 주민 중심 '테크 커뮤니케이터' 양성</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6 md:col-span-2">
+                <h3 class="text-2xl font-bold text-center mb-4 text-[#0a9396]">지속 가능한 디지털 교육 생태계 구축</h3>
+                <p class="text-center text-gray-600 mb-8">단순한 교육 제공을 넘어, 지역 사회 내에서 지식과 일자리가 선순환되는 자생적인 생태계를 만듭니다.</p>
+                <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
+                    <div class="text-center p-4 border-2 border-[#94d2bd] rounded-lg">
+                        <p class="text-2xl">📚</p>
+                        <p class="font-bold text-[#005f73]">작은도서관</p>
+                        <p class="text-sm text-gray-500">디지털 허브로 전환</p>
+                    </div>
+                    <div class="flow-arrow md:hidden"></div>
+                    <div class="hidden md:flex items-center flow-arrow-horizontal"></div>
+                    <div class="text-center p-4 border-2 border-[#94d2bd] rounded-lg">
+                        <p class="text-2xl">👩‍🏫</p>
+                        <p class="font-bold text-[#005f73]">테크 커뮤니케이터</p>
+                        <p class="text-sm text-gray-500">전문 인력 양성 및 채용</p>
+                    </div>
+                    <div class="flow-arrow md:hidden"></div>
+                    <div class="hidden md:flex items-center flow-arrow-horizontal"></div>
+                     <div class="text-center p-4 border-2 border-[#94d2bd] rounded-lg">
+                        <p class="text-2xl">👨‍👩‍👧‍👦</p>
+                        <p class="font-bold text-[#005f73]">지역 주민</p>
+                        <p class="text-sm text-gray-500">디지털 교육 참여</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h4 class="text-xl font-bold text-center mb-2 text-[#ee9b00]">하이브리드 수익 모델</h4>
+                <p class="text-center text-gray-600 mb-4">사회적 가치와 재정적 자립을 동시에 추구하며, 발생한 수익은 전액 사회적 목적을 위해 재투자됩니다.</p>
+                <div class="chart-container h-72">
+                    <canvas id="revenueModelChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-lg p-6 flex flex-col justify-center">
+                 <h4 class="text-xl font-bold text-center mb-4 text-[#005f73]">강력한 실행 역량</h4>
+                 <ul class="space-y-4">
+                     <li class="flex items-start">
+                        <span class="text-[#0a9396] font-bold mr-3">✓</span>
+                        <div>
+                            <p class="font-bold">전문가 팀</p>
+                            <p class="text-gray-600">AI, XR, 비즈니스 전략 전문가로 구성된 핵심 인력</p>
+                        </div>
+                     </li>
+                     <li class="flex items-start">
+                        <span class="text-[#0a9396] font-bold mr-3">✓</span>
+                        <div>
+                            <p class="font-bold">Microsoft MVP</p>
+                            <p class="text-gray-600">대표의 기술 전문성과 글로벌 네트워크 보유</p>
+                        </div>
+                     </li>
+                      <li class="flex items-start">
+                        <span class="text-[#0a9396] font-bold mr-3">✓</span>
+                        <div>
+                            <p class="font-bold">사회적기업 인증</p>
+                            <p class="text-gray-600">경기도형 예비사회적기업 지정을 통한 공신력 확보</p>
+                        </div>
+                     </li>
+                 </ul>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-[#005f73] text-white mt-12">
+        <div class="container mx-auto px-6 py-8 text-center">
+            <h3 class="text-2xl font-bold mb-2">경기도의 디지털 미래를 위한 최고의 파트너</h3>
+            <p class="mb-4 text-[#e9d8a6]">파란두루미가 경기도의 디지털 격차 해소와 지역 사회 활성화를 함께 만들어가겠습니다.</p>
+            <p class="text-sm opacity-70">© Paran Durumi Inc. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const brilliantBlues = ['#0a9396', '#94d2bd', '#ee9b00', '#ca6702', '#bb3e03'];
+        const tooltipTitleCallback = (tooltipItems) => {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) {
+                return label.join(' ');
+            }
+            return label;
+        };
+        
+        const commonChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#334155',
+                        font: {
+                            size: 14,
+                            family: "'Noto Sans KR', sans-serif"
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        title: tooltipTitleCallback
+                    },
+                    titleFont: {
+                        family: "'Noto Sans KR', sans-serif"
+                    },
+                    bodyFont: {
+                        family: "'Noto Sans KR', sans-serif"
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    ticks: { color: '#475569' },
+                    grid: { color: '#e2e8f0' }
+                },
+                x: {
+                    ticks: { color: '#475569' },
+                    grid: { display: false }
+                }
+            }
+        };
+
+        new Chart(document.getElementById('libraryStatusChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['운영 미흡', '운영 보통 이상'],
+                datasets: [{
+                    data: [45.9, 54.1],
+                    backgroundColor: ['#ca6702', '#e9d8a6'],
+                    borderColor: '#ffffff',
+                    borderWidth: 4,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: { callbacks: { title: tooltipTitleCallback } }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('costComparisonChart'), {
+            type: 'bar',
+            data: {
+                labels: ['민간 AI/XR 교육기관', '파란두루미 디지털 놀이터'],
+                datasets: [{
+                    label: '상대적 교육 비용',
+                    data: [100, 60],
+                    backgroundColor: ['#bb3e03', '#0a9396'],
+                    borderRadius: 4
+                }]
+            },
+            options: { ...commonChartOptions, indexAxis: 'y' }
+        });
+
+        new Chart(document.getElementById('growthRoadmapChart'), {
+            type: 'line',
+            data: {
+                labels: ['현재', '1년 후', '2년 후', '3년 후'],
+                datasets: [
+                    {
+                        label: '디지털 허브 (개소)',
+                        data: [1, 15, 30, 50],
+                        borderColor: '#0a9396',
+                        backgroundColor: '#0a939620',
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: '누적 참여자 (명)',
+                        data: [0, 300, 600, 1000],
+                        borderColor: '#ee9b00',
+                        backgroundColor: '#ee9b0020',
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: '테크 커뮤니케이터 (명)',
+                        data: [2, 15, 30, 50],
+                        borderColor: '#ca6702',
+                        backgroundColor: '#ca670220',
+                        fill: true,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: commonChartOptions
+        });
+
+        new Chart(document.getElementById('revenueModelChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['교육 수강료', '정부 지원금', '부가 서비스'],
+                datasets: [{
+                    data: [50, 30, 20],
+                    backgroundColor: ['#0a9396', '#94d2bd', '#e9d8a6'],
+                    borderColor: '#ffffff',
+                    borderWidth: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: { callbacks: { title: tooltipTitleCallback } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
