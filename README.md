@@ -21,6 +21,10 @@ A repository to share ideas, documents and wrap up for GM-related projects.
 ### 📁 Social Enterprise
 사회적 기업 관련 문서 및 자료
 
+### 📁 작은도서관 활성화
+[파란두루미가 제안하는 작은도서관 활성화](./small-library-project/index.html)
+
+
 ## Documents
 
 - [Grok3 Suggestion](./Grok3-suggestion.md)
