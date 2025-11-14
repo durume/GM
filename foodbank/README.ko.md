@@ -69,7 +69,7 @@ graph TD
 | Table Name | Role | Key Column | Other Important Columns |
 | :--- | :--- | :--- | :--- |
 | `Inventories` | 물리적 창고/보관 장소 목록 | `Inventory_ID` | `Inventory_Name`, `Address` |
-| `Items` | 모든 고유 물품의 마스터 목록 | `Item_ID` | `Item_Name`, `Category` |
+| `Items` | 모든 고유 물품의 마스터 목록 | `Item_ID` | `Item_Name`, `Category_Large`, `Category_Medium`, `Category_Small` |
 | `Stock` | 물품과 창고를 연결하여 수량 추적 | `Stock_ID` | `Inventory_ID` (참조), `Item_ID` (참조), `Quantity`, `Expiry_Date` |
 | `Clients` | 대상자 프로필 및 특이사항 관리 | `Client_ID` | `Name`, `Address`, `Allergies_Dietary_Restrictions` |
 | `Distribution_Log` | 물품 출고 및 배분 증빙 로그 | `Log_ID` | `Distribution_Date`, `Client_ID` (참조), `Recipient_Signature` |

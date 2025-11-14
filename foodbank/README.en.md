@@ -69,7 +69,7 @@ The database is normalized to prevent data redundancy and improve scalability. T
 | Table Name | Role | Key Column | Other Important Columns |
 | :--- | :--- | :--- | :--- |
 | `Inventories` | Stores physical warehouse/pantry locations | `Inventory_ID` | `Inventory_Name`, `Address` |
-| `Items` | Master list of all unique items | `Item_ID` | `Item_Name`, `Category` |
+| `Items` | Master list of all unique items | `Item_ID` | `Item_Name`, `Category_Large`, `Category_Medium`, `Category_Small` |
 | `Stock` | Links Items to Inventories, tracking quantity | `Stock_ID` | `Inventory_ID` (Ref), `Item_ID` (Ref), `Quantity`, `Expiry_Date` |
 | `Clients` | Client profiles and special needs | `Client_ID` | `Name`, `Address`, `Allergies_Dietary_Restrictions` |
 | `Distribution_Log` | Records of item distribution and proof | `Log_ID` | `Distribution_Date`, `Client_ID` (Ref), `Recipient_Signature` |
