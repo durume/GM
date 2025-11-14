@@ -49,11 +49,67 @@ Google Sheets 기반의 데이터베이스를 활용하여 광명시 푸드뱅�
 | **Donor CRM** | `Donors` | Table | Menu | 연락처와 커뮤니케이션 선호도 필터 |
 | **Volunteer Schedule** | `Volunteer_Shifts` | Calendar | Right | 주간 캘린더로 차주 봉사 배치 확인 |
 | **Program Enrollment** | `Client_Programs` | Table | Menu | `Status`별 색상 강조, Ref 뷰로 연결 |
+| **Inbound Donations Dashboard** | `Donation_Items` | Dashboard | Center | 품목별 합계 차트 + 최근 접수 테이블로 재고 유입 한눈에 파악 |
+| **Client Outreach Map** | `Clients` | Map | Menu | 주소 확인 후 현장 배달 동선 계획, 언어 태그 색상 규칙 적용 |
+| **Volunteer Leaderboard** | `Volunteer_Shifts` | Chart | Menu | `SUM(Duration)` 기준 상위 봉사자 시각화, 동기 부여용 |
 
 ### UX 힌트
 
 - `Clients` 상세 뷰에 `REF_ROWS("Distribution_Events", "Client_ID")`와 `REF_ROWS("Client_Programs", "Client_ID")`를 각각 추가하면 가구 이력과 프로그램 참여 현황을 한눈에 볼 수 있어요.
 - `Stock` 테이블에 색상 규칙을 적용하여 `[Quantity] <= [Reorder_Threshold]`일 때 빨간색 카드로 표시하세요.
+- 대시보드 뷰에 `Donation Intake` 폼과 `Inbound Donations Dashboard`를 함께 배치하면 신규 기부 입력 직후 재고 반영 결과를 바로 확인할 수 있어요.
+- `Client Outreach Map`과 `Distribution Planner`를 동기화하여 지도에서 항목을 탭하면 해당 배분 이벤트 상세로 이동하도록 `Row Selected` 행동을 연결하세요.
+
+### 뷰 생성 가이드 (Step-by-step)
+
+1. **Deck View: Distribution Planner**
+
+    - AppSheet 편집기 좌측 메뉴에서 `UX` → `Views` → `New View`를 선택하세요.
+    - 이름에 `Distribution Planner`, 데이터 소스로 `Distribution_Events`, View type을 `Deck`으로 지정합니다.
+    - `Behavior` 탭에서 `Row selected`를 `Auto` 유지하고, `Grouping` 섹션에서 `Group by`를 `Distribution_Date`로 설정해 날짜별 묶음을 만듭니다.
+    - `Options`에서 `Prominence`를 `Primary`로 바꾸면 좌측 내비게이션에 고정됩니다.
+
+1. **Dashboard View: Inventory Command Center**
+
+    - `New View`를 열고 이름을 `Inventory Command Center`, View type을 `Dashboard`, `Position`을 `Center`로 설정합니다.
+    - `View entries`에 `Stock_Table`, `Stock_Card`, `Stock_Chart` (또는 원하는 기존 뷰)를 추가하여 카드/차트/테이블 조합을 만듭니다.
+    - `Interactive mode`를 켜면 대시보드 내에서 항목을 선택할 때 다른 위젯이 필터링됩니다.
+    - `Options`에서 `Use tabs in mobile view`를 해제하면 단일 화면에 카드/차트를 동시에 표시할 수 있습니다.
+
+1. **Map View: Client Outreach Map**
+
+    - `New View` → 이름 `Client Outreach Map`, 데이터 소스 `Clients`, View type `Map`을 선택합니다.
+    - `Map style`을 `Roadmap`, `Address or LatLong` 필드를 `[Address]` 또는 지정한 위치 컬럼으로 매핑합니다.
+    - `Format Rules`에서 `[Preferred_Language]` 값을 기준으로 점 색상을 바꾸면 현장 방문 동선을 언어별로 구분할 수 있습니다.
+    - `Row selected` 액션을 `App: go to another view within this app` → `LINKTOVIEW("Distribution Planner")`로 지정해 지도에서 바로 일정으로 이동하세요.
+
+1. **Card View: Low Stock Highlight**
+
+    - 이름 `Low Stock Cards`, 데이터 소스 `Stock`, View type `Card`를 선택합니다.
+    - `Row image`에 재고 이미지 컬럼이 있다면 연결하고, `Primary header`를 `[Item_ID].[Item_Name]`, `Primary footer`를 `[Quantity]`로 설정합니다.
+    - `Slice`를 이용해 `[Quantity] <= [Reorder_Threshold]` 조건을 먼저 만들어 이 뷰에 연결하면 필요한 품목만 보여줄 수 있습니다.
+    - `Options`에서 `Group by` → `Inventory_ID`를 적용해 창고별 위험 품목을 묶어서 표시하세요.
+
+1. **Chart View: Volunteer Leaderboard**
+
+    - `New View` → 이름 `Volunteer Leaderboard`, 데이터 `Volunteer_Shifts`, View type `Chart`를 고릅니다.
+    - `Chart type`을 `Column`으로 지정하고 `Label column`은 `[Volunteer_ID].[Name]`, `Values`는 `SUM([Duration])` 집계를 선택합니다.
+    - `Grouping`에서 `Group by`를 `Volunteer_ID`로 설정하면 자원봉사자 단위로 누적 시간이 계산됩니다.
+    - 모바일 가독성을 위해 `Options`의 `Stacked`를 끄고 `Short name`을 `Leaderboard`로 지정하면 하단 메뉴에 짧게 표시됩니다.
+
+1. **Calendar View: Volunteer Schedule**
+
+    - `New View` → 이름 `Volunteer Schedule`, 데이터 `Volunteer_Shifts`, View type `Calendar`를 선택합니다.
+    - `Start date`는 `[Shift_Date]`, `End date`는 `[Shift_End]` 또는 동일 컬럼으로 설정합니다.
+    - `Category`에 `[Shift_Status]`를 할당하면 상태별 색상으로 일정이 구분됩니다.
+    - `Options`에서 `Time zone`을 `Asia/Seoul`로 지정해 봉사 시간 표시 오류를 방지하세요.
+
+1. **Form View: Donation Intake**
+
+    - `New View` → 이름 `Donation Intake`, 데이터 `Donations`, View type `Form`을 설정합니다.
+    - `Behavior` 탭의 `Form Saved` 액션으로 `Donation Intake (Inflow)` 오토메이션용 행동을 연결합니다.
+    - `Pages`에서 `Section`을 분리해 `Donor Details`, `Donation Logistics`, `Documentation` 등을 나누면 초보자가 필드를 놓치지 않습니다.
+    - `Quick edit columns`에 `Related Donation_Items`를 추가하면 폼 저장 후 바로 품목 세부 정보를 입력할 수 있습니다.
 
 ## 3. 핵심 기능 구현: Action 및 Automation
 
