@@ -66,7 +66,7 @@ graph TD
 ## 🔗 Database Schema (Table Definitions)
 | Table Name | Role | Key Column | Other Important Columns |
 | :--- | :--- | :--- | :--- |
-| `Inventory` | Master inventory and expiry management | `Inventory_ID` | `Item_Name`, `Current_Stock`, `Expiry_Date` |
+| `Inventory` | Master inventory and expiry management | `Inventory_ID` | `Item_Name`, `Current_Stock`, `Expiry_Date`, `Address` |
 | `Clients` | Client profiles and special needs | `Client_ID` | `Name`, `Address`, `Allergies_Dietary_Restrictions` |
 | `Distribution_Log` | Records of item distribution and proof | `Log_ID` | `Distribution_Date`, `Client_ID`, `Recipient_Signature` |
 | `Donation_Log` | Records of item donations and sponsors | `Donation_ID` | `Donor_Name`, `Donation_Date`, `Item_Name`, `Quantity`, `Donor_Address` |

@@ -66,7 +66,7 @@ graph TD
 ## 🔗 데이터베이스 스키마 (Table Definitions)
 | Table Name | Role | Key Column | Other Important Columns |
 | :--- | :--- | :--- | :--- |
-| `Inventory` | 마스터 재고 및 유통기한 관리 | `Inventory_ID` | `Item_Name`, `Current_Stock`, `Expiry_Date` |
+| `Inventory` | 마스터 재고 및 유통기한 관리 | `Inventory_ID` | `Item_Name`, `Current_Stock`, `Expiry_Date`, `Address` |
 | `Clients` | 대상자 프로필 및 특이사항 관리 | `Client_ID` | `Name`, `Address`, `Allergies_Dietary_Restrictions` |
 | `Distribution_Log` | 물품 출고 및 배분 증빙 로그 | `Log_ID` | `Distribution_Date`, `Client_ID`, `Recipient_Signature` |
 | `Donation_Log` | 물품 입고 및 후원자 관리 로그 | `Donation_ID` | `Donor_Name`, `Donation_Date`, `Item_Name`, `Quantity`, `Donor_Address` |
