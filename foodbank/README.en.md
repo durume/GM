@@ -1,84 +1,133 @@
 
 # 🥕 Gwangmyeong Food Bank AppSheet Project
 
----
-
-## 📝 Project Overview
-This project aims to build a mobile-first AppSheet application to support the core operations of the Gwangmyeong Food Bank, including **inventory management, distribution tracking, and client management**, using Google Sheets as the database. This application will streamline workflows, automate critical notifications, and provide a centralized platform for managing food bank activities.
+Helping Gwangmyeong Food Bank digitize its operations with a no-code, mobile-first AppSheet app backed by Google Sheets.
 
 ---
 
-## 🏛️ Architecture and Structure
-The architecture is designed for simplicity, scalability, and low-maintenance overhead, leveraging the powerful integration between Google Sheets and AppSheet.
+## Start Here (15-minute Quick Setup)
 
-### Architectural Diagram (Mermaid)
+Absolute beginner? Follow these steps in order. Every file you need already lives in this repository.
+
+1. **Copy the sample data:** Upload each CSV in `database/` into its own worksheet inside a new Google Sheet named `Gwangmyeong Food Bank DB`. Start with the core tables (`Inventories`, `Items`, `Stock`, `Clients`, `Distribution_Events`, `Distribution_Items`, `Donations`, `Donation_Items`, `Donors`) and add the optional community modules (`Volunteers`, `Volunteer_Shifts`, `Programs`, `Client_Programs`) when you are ready.
+2. **Let AppSheet build the scaffold:** Visit [AppSheet](https://www.appsheet.com) -> `Create` -> `App` -> `Start with existing data`, select the Google Sheet you just prepared, and let the default app generate.
+3. **Run the in-editor checklist:** Use the AppSheet "To Do" panel to confirm key columns, label columns, and references. Match the guidance in `ProjectPrompt.md`.
+4. **Add your first automations:** Follow the "Automations" section in `ProjectPrompt.md` to enable the Low Stock email bot and the donation intake workflow that converts incoming donation items into stock.
+5. **Share & test:** Invite a teammate by email from the AppSheet "Users" tab so they can try the mobile app and give feedback.
+
+> **Need more hand-holding?** Open `AppSheet_Full_Guide.ko.md` for a fully narrated, screenshot-friendly walkthrough in Korean.
+
+---
+
+## Guided Learning Path
+
+- **Phase 1 - Foundation (30-45 min):** Complete the Quick Setup above, then explore the `Stock` and `Clients` views on your phone to confirm relationships between tables.
+- **Phase 2 - Personalize (45-60 min):** Follow the "Views and UX" section in `ProjectPrompt.md` to style dashboards and surface donor and distribution pipelines with grouped deck views.
+- **Phase 3 - Automate (60+ min):** Build the inflow/outflow `Actions`, donation-to-stock automation, and low-stock alerts. Submit test donations and distributions to validate each workflow.
+- **Phase 4 - Community modules (optional, 45+ min):** Turn on volunteer scheduling and client program tracking once the core flows feel solid.
+
+Keep this progression visible during workshops so participants always know what is next.
+
+---
+
+## Bring Generative AI Into the Build
+
+- **Describe-your-app start:** On the AppSheet start screen, choose **"Create an app from an idea"** (Labs). Paste a short prompt such as:
+    > "Create a food bank inventory tracker that manages donations, clients, and low-stock alerts."
+  Compare the generated schema with the one in this repo and merge anything useful.
+- **Use AppSheet Assistant:** Inside the editor, tap the Assistant (sparkle icon) and ask questions like "How do I decrement stock when a distribution is saved?" The Assistant will suggest expressions and automation steps you can copy.
+- **Prototype community modules:** Ask for help building volunteer shift reminders or client program enrollment views, then adapt the suggested expressions to the new tables.
+- **Document prompts:** Save the prompts you use into a new section of your Google Sheet so newcomers can reuse winning prompts in future cohorts.
+
+---
+
+## Architecture Overview (For Reference)
+
+The solution stays intentionally lightweight so non-technical staff can support it.
+
 ```mermaid
 graph TD
     subgraph "User Interface (AppSheet)"
-        A[📱 Mobile App]
+        A[Mobile App]
         A -- Interacts with --> B{Views & Forms};
         B -- Triggers --> C{Actions & Automations};
     end
 
     subgraph "Data & Logic Layer (Google Cloud)"
-        D[📊 Google Sheets Database]
+        D[Google Sheets Database]
         D -- Stores data for --> B;
         C -- Manipulates data in --> D;
-        E[🔄 AppSheet Automation]
+        E[AppSheet Automation]
         E -- Monitors data in --> D;
-        E -- Sends --> F[📧 Email Notifications];
+        E -- Sends --> F[Email & Chat Alerts];
     end
 
-    subgraph "Key Workflows"
+    subgraph "Operational Workflows"
         direction LR
-        G[Donation] -- Inflow --> D;
-        H[Distribution] -- Outflow --> D;
-        I[Low Stock Alert] -- Triggered by --> E;
-        J[Expiry Warning] -- Triggered by --> E;
+        G[Donation Intake] -- Inflow --> D;
+        H[Distribution Fulfillment] -- Outflow --> D;
+        I[Inventory Alerts] -- Triggered by --> E;
+    end
+
+    subgraph "Community Workflows"
+        direction LR
+        K[Donor Stewardship] --> D;
+        L[Volunteer Scheduling] --> D;
+        M[Program Enrollment] --> D;
     end
 
     A --> G;
     A --> H;
+    A --> K;
+    A --> L;
+    A --> M;
+    I --> C;
 ```
 
-### Architectural Explanation
-*   **Data Source (Google Sheets):** A single Google Sheet acts as the backend database, containing four interconnected tables (worksheets). This approach is cost-effective and easy for non-developers to view and manage directly if needed.
-*   **Application Layer (AppSheet):** The AppSheet platform reads the Google Sheet and generates a feature-rich mobile application. It handles the UI, data manipulation logic (Actions), and business rules.
-*   **User Interface (Views & Forms):** The app provides intuitive views (Dashboard, Deck, Table) for displaying data and user-friendly forms for data entry (e.g., new distribution, new donation).
-*   **Business Logic (Actions & Automations):**
-    *   **Actions:** Triggered by user interactions (like saving a form), these actions update the inventory in real-time. For example, when a distribution is recorded, the stock level of the distributed item is automatically decremented.
-    *   **Automations:** These are scheduled server-side processes that run independently. The system automatically checks for low-stock items and expiring products daily, sending email alerts to the responsible staff. This proactive approach minimizes waste and prevents stock shortages.
+### Architectural Notes
+
+- **Data Source (Google Sheets):** One workbook now houses inventory, service, donor, volunteer, and program tables so staff can audit everything in a single place.
+- **AppSheet Layer:** Handles the UI, validation, and automations without code, relying on references between event and line-item tables.
+- **Inventory & Service Logic:** `Stock` tracks reorder metadata while `Distribution_Events`/`Distribution_Items` and `Donations`/`Donation_Items` isolate detailed transactions.
+- **Community Modules:** `Donors`, `Volunteers`, and `Client_Programs` introduce stewardship, scheduling, and impact reporting without extra tooling.
+- **Automations:** Scheduled bots cover low-stock alerts, expiry checks, donation intake, and volunteer reminders.
 
 ---
 
-## 🚀 How to Use & Setup
-1.  **Prepare Google Sheet:** Create a new Google Sheet named `Gwangmyeong Food Bank DB`.
-2.  **Create Worksheets:** Inside the sheet, create four worksheets with the exact names: `Inventory`, `Clients`, `Distribution_Log`, `Donation_Log`.
-3.  **Define Columns:** In the first row of each worksheet, enter the column headers as defined in the database schema section. The order and exact naming are critical.
-4.  **Connect to AppSheet:**
-    *   Go to [AppSheet](https://www.appsheet.com) and start a new app.
-    *   Connect it to your Google account and choose the `Gwangmyeong Food Bank DB` sheet as the data source.
-    *   AppSheet will automatically detect the tables.
-5.  **Configure App:** Follow the specifications in `ProjectPrompt.md` to configure views, actions, and automations.
+## Database Schema Cheat Sheet
 
----
+### Core Operations
 
-## 🔗 Database Schema (Table Definitions)
-The database is normalized to prevent data redundancy and improve scalability. The inventory is managed across three related tables:
-
-| Table Name | Role | Key Column | Other Important Columns |
+| Table Name | Role | Key Column | Highlights |
 | :--- | :--- | :--- | :--- |
-| `Inventories` | Stores physical warehouse/pantry locations | `Inventory_ID` | `Inventory_Name`, `Address` |
-| `Items` | Master list of all unique items | `Item_ID` | `Item_Name`, `Category_Large`, `Category_Medium`, `Category_Small` |
-| `Stock` | Links Items to Inventories, tracking quantity | `Stock_ID` | `Inventory_ID` (Ref), `Item_ID` (Ref), `Quantity`, `Expiry_Date` |
-| `Clients` | Client profiles and special needs | `Client_ID` | `Name`, `Address`, `Allergies_Dietary_Restrictions` |
-| `Distribution_Log` | Records of item distribution and proof | `Log_ID` | `Distribution_Date`, `Client_ID` (Ref), `Recipient_Signature` |
-| `Donation_Log` | Records of item donations and sponsors | `Donation_ID` | `Donor_Name`, `Donation_Date`, `Item_ID` (Ref), `Quantity` |
+| `Inventories` | Physical storage locations with capacity and contacts | `Inventory_ID` | Manager info, capacity, temperature control |
+| `Items` | Master catalog of items | `Item_ID` | Unit size, storage type, dietary tags, reorder point |
+| `Stock` | Inventory snapshot linking items to locations | `Stock_ID` | Reorder thresholds, last count metadata, storage bins |
+| `Clients` | Household records receiving services | `Client_ID` | Language, household size, eligibility status |
+| `Distribution_Events` | Header record for each pickup or delivery | `Distribution_ID` | Pickup method, staff lead, signature capture |
+| `Distribution_Items` | Line items tied to each distribution | `Distribution_Item_ID` | Links to stock and records quantities distributed |
+| `Donations` | Donation intake events | `Donation_ID` | Delivery method, paperwork status, receiving staff |
+| `Donation_Items` | Items received per donation | `Donation_Item_ID` | Routes items to inventories on arrival |
+| `Donors` | Donor profiles and preferences | `Donor_ID` | Contact methods, donor type, notes |
 
-**Table Descriptions:**
-*   **Inventories:** A simple list of all physical locations (e.g., "Gwangmyeong City Hall Pantry", "Soha-dong Warehouse") where items are stored.
-*   **Items:** The master catalog of every unique item the food bank handles (e.g., "Rice 10kg", "Ramen 5-pack"). This prevents duplicate item names and makes management easier.
-*   **Stock:** The core inventory tracking table. It answers the question: "How many of *which item* are at *which inventory location*?" It links the `Inventories` and `Items` tables.
-*   **Clients:** Manages information about the individuals receiving support.
-*   **Distribution_Log:** A log of all distribution activities. It should be modified to link to a `Stock_ID` to decrement the correct stock.
-*   **Donation_Log:** Tracks all incoming donations. It now links to an `Item_ID` to specify what was donated.
+### Community & Programs
+
+| Table Name | Role | Key Column | Highlights |
+| :--- | :--- | :--- | :--- |
+| `Volunteers` | Volunteer directory | `Volunteer_ID` | Preferred roles, availability, training status |
+| `Volunteer_Shifts` | Scheduled volunteer assignments | `Shift_ID` | Dates, roles, and shift status |
+| `Programs` | Service programs offered to clients | `Program_ID` | Target groups and active flag |
+| `Client_Programs` | Enrollment of clients into programs | `Client_Program_ID` | Enrollment status and notes |
+
+> Looking for sample data? Each CSV in `database/` ships with ready-to-import demo rows for workshops and testing.
+
+---
+
+## Supporting Documents
+
+- `AppSheet_Full_Guide.ko.md`: Conversational Korean walkthrough aimed at complete beginners.
+- `ProjectPrompt.md`: Operator checklist for configuring views, actions, automations, and community modules.
+- `README.ko.md`: Korean version of this overview for bilingual teams.
+
+Use these documents together to support mixed-language teams and first-time builders.
+

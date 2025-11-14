@@ -1,0 +1,6 @@
+"Distribution_Item_ID","Distribution_ID","Stock_ID","Item_ID","Quantity_Distributed","Unit","Outcome_Notes"
+"DISTI001","DIST001","STK001","ITM001",2,"포대",""
+"DISTI002","DIST001","STK005","ITM005",1,"묶음",""
+"DISTI003","DIST002","STK003","ITM002",3,"세트","땅콩 관련 없음 확인"
+"DISTI004","DIST003","STK006","ITM008",5,"봉지","냉동상태 양호"
+"DISTI005","DIST003","STK007","ITM004",2,"박스",""

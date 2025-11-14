@@ -1,0 +1,4 @@
+"Shift_ID","Volunteer_ID","Shift_Date","Start_Time","End_Time","Location","Role","Shift_Status","Notes"
+"SHIFT001","VOL001","2025-11-15","09:00","13:00","광명점","물품 분류","Scheduled","신규 기부 정리"
+"SHIFT002","VOL003","2025-11-14","13:30","16:30","광명점","통역","Scheduled","베트남어 통역 배치"
+"SHIFT003","VOL002","2025-11-16","10:00","12:30","소하점","배달 지원","Pending","차량 확보 필요"

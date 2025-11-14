@@ -1,3 +1,2 @@
-"Log_ID","Distribution_Date","Client_ID","Recipient_Signature"
+"Deprecated","Use","Distribution_Events.csv","Distribution_Items.csv"
 "LOG001","2025-11-13","C001",""
-"LOG002","2025-11-13","C002",""

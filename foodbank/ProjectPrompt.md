@@ -1,63 +1,125 @@
 # 🛠️ AppSheet Development Execution Prompt: Gwangmyeong Food Bank Management App
 
 ## 🎯 목표 (Goal)
-Google Sheets 기반의 데이터베이스를 활용하여 광명시 푸드뱅크의 핵심 업무(재고, 배분, 이용자 관리)를 지원하는 모바일 최적화 AppSheet 애플리케이션 구축.
+
+Google Sheets 기반의 데이터베이스를 활용하여 광명시 푸드뱅크의 재고, 배분, 후원자, 자원봉사, 프로그램 업무를 하나의 AppSheet 앱에서 운영합니다.
 
 ## 1. 데이터 소스 및 구조 설정 (Data Source & Structure Setup)
 
-**데이터 소스:** Google Sheet 파일 (`Gwangmyeong Food Bank DB` 권장)
+**데이터 소스:** Google Sheet 파일 (`Gwangmyeong Food Bank DB` 권장). 각 CSV를 동일한 이름의 워크시트로 가져옵니다.
 
-### 1-1. 테이블 설정 및 타입 정의
+### 1-1 핵심(Core) 테이블 매핑
 
-| Sheet | Key Column | Label Column | Initial View Type | Critical Type/Refs |
+| Sheet | Key Column | Label Column | Critical Refs | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| `물품_재고_현황` | `재고_ID` | `물품명` | Deck | `최종_유통기한` (Date) |
-| `이용자_정보` | `이용자_ID` | `이름` | Deck | `특이사항(알레르기/식단)` (Long Text) |
-| `배분_활동_기록` | `활동_기록_ID` | `배분_날짜` | Form | **`이용자_ID` (Ref: `이용자_정보`)** |
-| `기부_후원_내역` | `기부_ID` | `기부자_이름/기업명` | Table | `기부_날짜` (Date) |
+| `Inventories` | `Inventory_ID` | `Inventory_Name` | - | 창고 담당자, 용량, 온도 조건을 확인 |
+| `Items` | `Item_ID` | `Item_Name` | - | 유닛, 보관 유형, 식이 태그로 필터링 |
+| `Stock` | `Stock_ID` | `Item_ID` | `Inventory_ID` -> `Inventories`, `Item_ID` -> `Items` | 재고 임계치와 마지막 실사 정보 포함 |
+| `Clients` | `Client_ID` | `Household_Name` | - | 언어, 가구 규모, 자격 상태 필드 사용 |
+| `Distribution_Events` | `Distribution_ID` | `Distribution_Date` | `Client_ID` -> `Clients` | 픽업/배달 정보와 서명을 저장 |
+| `Distribution_Items` | `Distribution_Item_ID` | `Item_ID` | `Distribution_ID` -> `Distribution_Events`, `Stock_ID` -> `Stock` | 한 번의 배분에서 여러 품목을 처리 |
+| `Donors` | `Donor_ID` | `Donor_Name` | - | 후원자 연락처와 선호 채널 관리 |
+| `Donations` | `Donation_ID` | `Donation_Date` | `Donor_ID` -> `Donors` | 기부 전달 방식과 서류 상태 추적 |
+| `Donation_Items` | `Donation_Item_ID` | `Item_ID` | `Donation_ID` -> `Donations`, `Inventory_ID` -> `Inventories` | 기부 품목을 즉시 재고에 연결 |
 
-**📌 필수 설정:**
-1.  `배분_활동_기록` 테이블의 `이용자_ID` 컬럼을 **Ref** 타입으로 설정하고, 대상 테이블을 `이용자_정보`로 지정합니다.
-2.  `배분_활동_기록` 테이블의 `수령자_서명(파일)` 컬럼을 **Signature** 타입으로 설정합니다.
+### 1-2 선택(Optional) 모듈
 
-### 2. 사용자 경험(UX) 및 뷰 설정 (Views and UX)
-
-| View Name | Data Table | View Type | Position | Style/Grouping |
+| Sheet | Key Column | Label Column | Critical Refs | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| **Inventory Dashboard** | `물품_재고_현황` | Dashboard | Left/Center | (1) 재고 현황 (2) 유통기한 임박 리스트 통합 |
-| **New Distribution** | `배분_활동_기록` | Form | Center | 배분 시 가장 자주 사용되는 메인 뷰 |
-| **Client Search** | `이용자_정보` | Search/Deck | Right | `이름` 검색 활성화 |
-| **Donation Log** | `기부_후원_내역` | Table | Menu | Admin용 기록 조회 |
+| `Volunteers` | `Volunteer_ID` | `Name` | - | 선호 역할, 가능 시간, 교육 이력 관리 |
+| `Volunteer_Shifts` | `Shift_ID` | `Shift_Date` | `Volunteer_ID` -> `Volunteers` | 봉사 배치와 상태(예정, 완료) 추적 |
+| `Programs` | `Program_ID` | `Program_Name` | - | 대상 그룹, 활성 여부 |
+| `Client_Programs` | `Client_Program_ID` | `Client_ID` | `Client_ID` -> `Clients`, `Program_ID` -> `Programs` | 등록 상태, 메모, 시작 날짜 관리 |
 
-**추가 UX 개선:**
-* `이용자_정보` 상세 뷰(Detail View)에 **Virtual Column**을 생성하여, `REF_ROWS("배분_활동_기록", "이용자_ID")`를 통해 해당 이용자의 과거 **배분 활동 기록**을 인라인으로 표시합니다.
+### 1-3 추천 Virtual Columns & Expressions
 
-### 3. 핵심 기능 구현: Action 및 Automation
+- `Stock[Days_To_Expiry]`: `IF(ISBLANK([Expiry_Date]), "", ([Expiry_Date] - TODAY()))`
+- `Clients[Primary_Language_Flag]`: `IFS([Preferred_Language] = "Korean", "KR", [Preferred_Language] = "Vietnamese", "VI", TRUE, "ETC")`
+- `Donations[Total_Items]`: `SUM(SELECT(Donation_Items[Quantity], [Donation_ID] = [_THISROW].[Donation_ID]))`
+- `Volunteers[Next_Shift_Date]`: `MIN(SELECT(Volunteer_Shifts[Shift_Date], AND([Volunteer_ID] = [_THISROW].[Volunteer_ID], [Shift_Status] <> "Completed", [Shift_Date] >= TODAY())))`
 
-#### 3-1. AppSheet Action: 재고 자동 업데이트 (Inventory Adjustment)
+## 2. 사용자 경험(UX) 및 뷰 설정 (Views and UX)
 
-1.  **Action 1 (Outflow - 차감):**
-    * **Scope:** `배분_활동_기록` 테이블.
-    * **Execution:** 폼 저장 시(`Form Saved`).
-    * **Logic:** `물품_재고_현황` 테이블의 해당 물품의 `현재_재고_수량`을 입력된 수량만큼 **차감**하는 로직을 구현합니다.
-    * *Note: 이 로직은 `배분_물품_명세` 컬럼의 구조에 따라 복잡도가 달라질 수 있으므로, 초기에는 단일 품목만 배분한다고 가정하고 시작하거나, 별도의 자식 테이블을 구성해야 할 수 있습니다.*
+| View Name | Data Table | View Type | Position | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| **Inventory Command Center** | `Stock` | Dashboard | Center | 카드(재고 현황) + 차트(임박 기한) + 테이블(재고 임계치) 조합 |
+| **Distribution Planner** | `Distribution_Events` | Deck | Left | 날짜별 그룹, `Client_ID`와 `Pickup_Method` 하이라이트 |
+| **Distribution Detail** | `Distribution_Items` | Inline | Related | `Distribution_Events` 상세 뷰에 인라인으로 표시 |
+| **Donation Intake** | `Donations` | Form | Center | 기부 접수용 폼, 저장 시 Donation_Items Quick Edit |
+| **Donor CRM** | `Donors` | Table | Menu | 연락처와 커뮤니케이션 선호도 필터 |
+| **Volunteer Schedule** | `Volunteer_Shifts` | Calendar | Right | 주간 캘린더로 차주 봉사 배치 확인 |
+| **Program Enrollment** | `Client_Programs` | Table | Menu | `Status`별 색상 강조, Ref 뷰로 연결 |
 
-2.  **Action 2 (Inflow - 증가):**
-    * **Scope:** `기부_후원_내역` 테이블.
-    * **Execution:** 폼 저장 시(`Form Saved`).
-    * **Logic:** `물품_재고_현황` 테이블의 해당 물품의 `현재_재고_수량`을 입력된 수량만큼 **증가**시키고 `입고_날짜`를 업데이트합니다.
+### UX 힌트
 
-#### 3-2. AppSheet Automation: 자동 알림 (Alerts)
+- `Clients` 상세 뷰에 `REF_ROWS("Distribution_Events", "Client_ID")`와 `REF_ROWS("Client_Programs", "Client_ID")`를 각각 추가하면 가구 이력과 프로그램 참여 현황을 한눈에 볼 수 있어요.
+- `Stock` 테이블에 색상 규칙을 적용하여 `[Quantity] <= [Reorder_Threshold]`일 때 빨간색 카드로 표시하세요.
 
-1.  **Automation 1: Low Stock Alert (재고 부족):**
-    * **Event:** Scheduled check (Daily, KST).
-    * **Condition:** `SELECT(물품_재고_현황[재고_ID], [현재_재고_수량] < 50)`
-    * **Process:** Email Body에 재고 부족 물품 리스트를 포함하여 관리자 이메일로 발송.
-    * **Threshold:** 초기 임계값은 **50 단위**로 설정합니다.
+## 3. 핵심 기능 구현: Action 및 Automation
 
-2.  **Automation 2: Expiry Warning Alert (유통기한 임박):**
-    * **Event:** Scheduled check (Daily, KST).
-    * **Condition:** `TODAY() + [물품_재고_현황].[유통기한_알림_임계값(일)] >= [물품_재고_현황].[최종_유통기한]`
-    * **Process:** Email Body에 임박 물품 리스트와 유통기한을 포함하여 운영팀 이메일로 발송.
+### 3-1 Inventory & Service Actions
 
----
+1. **Distribution Fulfillment (Outflow)**
+
+    - **Scope:** `Distribution_Items`
+    - **Type:** Data: execute an action on a set of rows
+    - **Behavior:** `LINKTOFORM("Stock_Adjustment", "Stock_ID", [Stock_ID], "Adjustment_Type", "Out", "Quantity", [Quantity_Distributed])`
+    - **Effect:** 감소 폼을 호출하거나 직접 `[Quantity] - [Quantity_Distributed]` 계산식으로 업데이트 (AppSheet Assistant에 "inventory decrement" 질문 추천).
+    - **Trigger:** `Distribution_Items` 폼 저장 시 `Form Saved` 이벤트에 연결.
+
+1. **Donation Intake (Inflow)**
+
+    - **Scope:** `Donation_Items`
+    - **Type:** Data: execute an action on a set of rows
+    - **Behavior:** `LINKTOFORM("Stock_Adjustment", "Inventory_ID", [Inventory_ID], "Stock_ID", ANY(SELECT(Stock[Stock_ID], AND([Inventory_ID] = [_THISROW].[Inventory_ID], [Item_ID] = [_THISROW].[Item_ID]))), "Adjustment_Type", "In", "Quantity", [Quantity])`
+    - **Effect:** 존재하는 재고 라인을 찾고 없으면 새로 생성하도록 두 단계 분리 (Action A: 찾기, Action B: 없으면 추가).
+
+1. **Reorder Flag Reset**
+
+    - **Scope:** `Stock`
+    - **Type:** Data: set the values of some columns in this row
+    - **Behavior:** `[Last_Stock_Count] = [Quantity]`, `[Last_Stock_Count_Date] = TODAY()`
+    - **Use:** 실사 완료 시 Quick Edit 버튼으로 사용.
+
+### 3-2 Automations (Bots)
+
+1. **Low Stock Alert**
+
+    - **Event:** Scheduled daily 09:00 KST.
+    - **Condition:** `ANY(SELECT(Stock[Stock_ID], [Quantity] <= [Reorder_Threshold]))`
+    - **Process:** 이메일 + Microsoft Teams(웹훅) 알림, 부족 품목 테이블 포함.
+
+1. **Expiry Watchdog**
+
+    - **Event:** Scheduled daily 07:00 KST.
+    - **Condition:** `AND(ISNOTBLANK([Expiry_Date]), ([Expiry_Date] - TODAY()) <= 14)`
+    - **Process:** `[Inventory_ID].[Manager_Email]` (추가 열)로 요약 전송.
+
+1. **Donation Thank-you**
+
+    - **Event:** `Donations` 데이터 변경 (Adds Only)
+    - **Process:** Donor 이메일/문자 템플릿 발송 + Google Sheet `Donor_Touches` 탭에 기록(추가 가상 테이블).
+
+1. **Volunteer Shift Reminder**
+
+    - **Event:** Scheduled daily 18:00 KST.
+    - **Condition:** `AND([Shift_Date] = TODAY() + 1, [Shift_Status] = "Scheduled")`
+    - **Process:** 봉사자 이메일/문자 발송, 관리용 Slack/Teams 메시지 동시 전송.
+
+### 3-3 Community Touchpoints (Optional)
+
+- `Client_Programs` 상태가 `On Hold`로 변경되면 케이스 매니저에게 태스크 생성.
+- `Donors`의 `Preferred_Communication`이 `SMS`인 경우 Twilio 커넥터 사용을 고려.
+
+## 4. 테스트 & 운영 체크리스트
+
+- [ ] 기부 -> 재고 증가 -> 배분 -> 재고 감소 흐름이 샘플 데이터에서 정상 동작하는지 확인.
+- [ ] `Stock` 카드 색상 규칙과 Dashboard 차트가 최신 데이터를 반영하는지 확인.
+- [ ] Automations 4종이 기대한 시간에 실행되는지, 테스트 이메일 주소로 먼저 검증.
+- [ ] 모바일 앱에서 자원봉사 캘린더와 프로그램 등록 테이블이 보기 쉬운지 사용자 테스트 수행.
+- [ ] Google Sheet 공유 권한(보기/편집)을 역할별로 점검하고, AppSheet 보안 필터 적용 여부 확인.
+
+## 5. 생성형 AI 사용 팁
+
+- AppSheet Assistant에게 "Create action to reduce stock when distribution item saved" 또는 "Build volunteer reminder bot"처럼 구체적으로 요청하세요.
+- 완성된 표현식이나 봇 구성을 `README`와 별도 시트에 기록해 다음 기수 교육에서 재사용하세요.

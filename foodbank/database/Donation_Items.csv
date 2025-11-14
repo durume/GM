@@ -1,0 +1,6 @@
+"Donation_Item_ID","Donation_ID","Item_ID","Quantity","Unit","Expiry_Date","Inventory_ID"
+"DONI001","DON001","ITM001",10,"포대","2026-01-15","INV001"
+"DONI002","DON002","ITM002",50,"세트","2026-06-01","INV002"
+"DONI003","DON002","ITM005",30,"묶음","2025-09-01","INV001"
+"DONI004","DON003","ITM008",40,"봉지","2025-12-20","INV003"
+"DONI005","DON003","ITM004",24,"박스","2026-08-15","INV003"

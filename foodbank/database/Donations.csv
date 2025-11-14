@@ -1,0 +1,4 @@
+"Donation_ID","Donation_Date","Donor_ID","Received_By","Delivery_Method","Paperwork_Completed","Notes"
+"DON001","2025-11-12","DONR002","이정민","직접 방문","No","쌀 추가 기부 요청 예정"
+"DON002","2025-11-11","DONR001","박선영","기관 차량","Yes","문서 스캔 완료"
+"DON003","2025-11-13","DONR003","정우빈","업체 배송","Yes","냉동창고 이동 필요"
