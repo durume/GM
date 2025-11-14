@@ -64,15 +64,21 @@ graph TD
 ---
 
 ## 🔗 Database Schema (Table Definitions)
+The database is normalized to prevent data redundancy and improve scalability. The inventory is managed across three related tables:
+
 | Table Name | Role | Key Column | Other Important Columns |
 | :--- | :--- | :--- | :--- |
-| `Inventory` | Master inventory and expiry management | `Inventory_ID` | `Item_Name`, `Current_Stock`, `Expiry_Date`, `Address` |
+| `Inventories` | Stores physical warehouse/pantry locations | `Inventory_ID` | `Inventory_Name`, `Address` |
+| `Items` | Master list of all unique items | `Item_ID` | `Item_Name`, `Category` |
+| `Stock` | Links Items to Inventories, tracking quantity | `Stock_ID` | `Inventory_ID` (Ref), `Item_ID` (Ref), `Quantity`, `Expiry_Date` |
 | `Clients` | Client profiles and special needs | `Client_ID` | `Name`, `Address`, `Allergies_Dietary_Restrictions` |
-| `Distribution_Log` | Records of item distribution and proof | `Log_ID` | `Distribution_Date`, `Client_ID`, `Recipient_Signature` |
-| `Donation_Log` | Records of item donations and sponsors | `Donation_ID` | `Donor_Name`, `Donation_Date`, `Item_Name`, `Quantity`, `Donor_Address` |
+| `Distribution_Log` | Records of item distribution and proof | `Log_ID` | `Distribution_Date`, `Client_ID` (Ref), `Recipient_Signature` |
+| `Donation_Log` | Records of item donations and sponsors | `Donation_ID` | `Donor_Name`, `Donation_Date`, `Item_ID` (Ref), `Quantity` |
 
 **Table Descriptions:**
-*   **Inventory:** Tracks all available items, their current quantities, and expiry dates.
-*   **Clients:** Manages information about the individuals receiving support, including their address and any dietary needs.
-*   **Distribution_Log:** A log of all distribution activities, linking items to clients and capturing a signature as proof of receipt.
-*   **Donation_Log:** Tracks all incoming donations, including who donated, what they donated, the quantity, and their address. This is critical for donor relations and for providing donation receipts for tax purposes (e.g., 연말정산).
+*   **Inventories:** A simple list of all physical locations (e.g., "Gwangmyeong City Hall Pantry", "Soha-dong Warehouse") where items are stored.
+*   **Items:** The master catalog of every unique item the food bank handles (e.g., "Rice 10kg", "Ramen 5-pack"). This prevents duplicate item names and makes management easier.
+*   **Stock:** The core inventory tracking table. It answers the question: "How many of *which item* are at *which inventory location*?" It links the `Inventories` and `Items` tables.
+*   **Clients:** Manages information about the individuals receiving support.
+*   **Distribution_Log:** A log of all distribution activities. It should be modified to link to a `Stock_ID` to decrement the correct stock.
+*   **Donation_Log:** Tracks all incoming donations. It now links to an `Item_ID` to specify what was donated.

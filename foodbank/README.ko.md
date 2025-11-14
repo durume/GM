@@ -64,15 +64,21 @@ graph TD
 ---
 
 ## 🔗 데이터베이스 스키마 (Table Definitions)
+데이터베이스는 데이터 중복을 방지하고 확장성을 개선하기 위해 정규화되었습니다. 재고 관리는 아래의 세 가지 연관된 테이블을 통해 이루어집니다.
+
 | Table Name | Role | Key Column | Other Important Columns |
 | :--- | :--- | :--- | :--- |
-| `Inventory` | 마스터 재고 및 유통기한 관리 | `Inventory_ID` | `Item_Name`, `Current_Stock`, `Expiry_Date`, `Address` |
+| `Inventories` | 물리적 창고/보관 장소 목록 | `Inventory_ID` | `Inventory_Name`, `Address` |
+| `Items` | 모든 고유 물품의 마스터 목록 | `Item_ID` | `Item_Name`, `Category` |
+| `Stock` | 물품과 창고를 연결하여 수량 추적 | `Stock_ID` | `Inventory_ID` (참조), `Item_ID` (참조), `Quantity`, `Expiry_Date` |
 | `Clients` | 대상자 프로필 및 특이사항 관리 | `Client_ID` | `Name`, `Address`, `Allergies_Dietary_Restrictions` |
-| `Distribution_Log` | 물품 출고 및 배분 증빙 로그 | `Log_ID` | `Distribution_Date`, `Client_ID`, `Recipient_Signature` |
-| `Donation_Log` | 물품 입고 및 후원자 관리 로그 | `Donation_ID` | `Donor_Name`, `Donation_Date`, `Item_Name`, `Quantity`, `Donor_Address` |
+| `Distribution_Log` | 물품 출고 및 배분 증빙 로그 | `Log_ID` | `Distribution_Date`, `Client_ID` (참조), `Recipient_Signature` |
+| `Donation_Log` | 물품 입고 및 후원자 관리 로그 | `Donation_ID` | `Donor_Name`, `Donation_Date`, `Item_ID` (참조), `Quantity` |
 
 **테이블 설명:**
-*   **Inventory:** 모든 가용 물품, 현재 수량, 유통기한을 추적합니다.
-*   **Clients:** 지원을 받는 개인에 대한 정보(주소, 식단 관련 특이사항 등)를 관리합니다.
-*   **Distribution_Log:** 모든 배분 활동에 대한 기록으로, 물품과 수혜자를 연결하고 수령 증빙으로 서명을 캡처합니다.
-*   **Donation_Log:** 모든 기부 내역을 추적합니다. 기부자, 기부 물품, 수량, 주소 등의 정보가 포함됩니다. 이 정보는 기부자 관계 관리 및 연말정산과 같은 세금 목적의 기부금 영수증 발급에 매우 중요합니다.
+*   **Inventories:** 물품이 보관되는 모든 물리적 장소(예: "광명시청 푸드뱅크", "소하동 제1창고")의 목록입니다.
+*   **Items:** 푸드뱅크가 취급하는 모든 고유 물품(예: "쌀 10kg", "라면 5개입")의 마스터 카탈로그입니다. 이는 중복된 물품명을 방지하고 관리를 용이하게 합니다.
+*   **Stock:** 핵심 재고 추적 테이블입니다. "**어떤 물품이** **어느 창고에** 몇 개나 있는지"에 대한 질문에 답합니다. `Inventories`와 `Items` 테이블을 연결하는 역할을 합니다.
+*   **Clients:** 지원을 받는 개인에 대한 정보를 관리합니다.
+*   **Distribution_Log:** 모든 배분 활동에 대한 기록입니다. 정확한 재고 감소를 위해 `Stock_ID`와 연결되도록 수정해야 합니다.
+*   **Donation_Log:** 모든 기부 내역을 추적합니다. 이제 `Item_ID`와 연결되어 어떤 물품이 기부되었는지 명확히 합니다.
