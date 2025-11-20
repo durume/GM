@@ -1,9 +1,13 @@
 {
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/assets/*", "/images/*", "/*.{js,css,png,jpg,svg,ico,json}"]
+    "exclude": ["/assets/*", "/images/*", "/api/*", "/*.{js,css,png,jpg,svg,ico,json}"]
   },
   "routes": [
+    {
+      "route": "/api/*",
+      "allowedRoles": ["anonymous"]
+    },
     {
       "route": "/assets/*.js",
       "headers": {

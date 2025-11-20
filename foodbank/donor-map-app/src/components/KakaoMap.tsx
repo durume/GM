@@ -4,7 +4,7 @@ import type { Donor } from '../types/donor';
 interface KakaoMapProps {
   donors: Donor[];
   kakaoApiKey: string;
-  kakaoRestApiKey: string;
+  apiBaseUrl: string;
 }
 
 interface RouteInfo {
@@ -17,7 +17,7 @@ const GWANGMYEONG_CENTER = {
   lng: 126.8642888
 };
 
-const KakaoMap = ({ donors, kakaoApiKey, kakaoRestApiKey }: KakaoMapProps) => {
+const KakaoMap = ({ donors, kakaoApiKey, apiBaseUrl }: KakaoMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const polylineRef = useRef<any>(null);
@@ -219,15 +219,9 @@ const KakaoMap = ({ donors, kakaoApiKey, kakaoRestApiKey }: KakaoMapProps) => {
     setIsLoadingRoute(true);
 
     try {
-      // Use Kakao Directions API (Walking mode)
+      // Call our secure Azure Function proxy instead of Kakao API directly
       const response = await fetch(
-        `https://apis-navi.kakaomobility.com/v1/directions?origin=${userLocation.lng},${userLocation.lat}&destination=${selectedDonor.coordinates.lng},${selectedDonor.coordinates.lat}&priority=RECOMMEND&car_fuel=GASOLINE&car_hipass=false&alternatives=false&road_details=false`,
-        {
-          headers: {
-            'Authorization': `KakaoAK ${kakaoRestApiKey}`,
-            'Content-Type': 'application/json'
-          }
-        }
+        `${apiBaseUrl}/directions?origin=${userLocation.lng},${userLocation.lat}&destination=${selectedDonor.coordinates.lng},${selectedDonor.coordinates.lat}`
       );
 
       if (!response.ok) {

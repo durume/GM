@@ -3,7 +3,7 @@
 interface ImportMetaEnv {
   readonly VITE_MAPBOX_TOKEN: string
   readonly VITE_KAKAO_API_KEY: string
-  readonly VITE_KAKAO_REST_API_KEY: string
+  readonly VITE_API_BASE_URL: string
 }
 
 interface ImportMeta {
