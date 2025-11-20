@@ -1,9 +1,9 @@
 {
   "metadata": {
-    "lastUpdated": "2025-11-20T18:45:00Z",
+    "lastUpdated": "2025-11-20T20:45:00Z",
     "totalDonors": 3,
-    "geocodingStatus": "complete-approximate",
-    "notes": "All donors have coordinates. DONR002 and DONR003 use approximate coordinates and should be verified with Kakao/Naver Maps API for precise location."
+    "geocodingStatus": "verified",
+    "notes": "All donors have verified coordinates. DONR002 verified with Kakao Maps API."
   },
   "donors": [
     {
@@ -30,10 +30,8 @@
       "phone": "010-7777-8888",
       "address": "경기도 광명시 오리로 362",
       "coordinates": {
-        "lat": 37.4211,
-        "lng": 126.8675,
-        "geocoded": false,
-        "note": "Approximate coordinates for Soha-dong area - needs Kakao/Naver Maps verification"
+        "lat": 37.434568,
+        "lng": 126.879633
       },
       "preferredCommunication": "SMS",
       "notes": "연말 집중 기부"

@@ -7,6 +7,7 @@ const donorData = donorDataRaw as DonorData;
 
 const KakaoPage = () => {
   const kakaoApiKey = import.meta.env.VITE_KAKAO_API_KEY;
+  const kakaoRestApiKey = import.meta.env.VITE_KAKAO_REST_API_KEY;
   const navigate = useNavigate();
 
   if (!kakaoApiKey) {
@@ -94,6 +95,7 @@ const KakaoPage = () => {
         <KakaoMap
           donors={donorData.donors}
           kakaoApiKey={kakaoApiKey}
+          kakaoRestApiKey={kakaoRestApiKey}
         />
       </div>
 
