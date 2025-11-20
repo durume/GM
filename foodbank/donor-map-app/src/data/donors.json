@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "lastUpdated": "2025-11-20T18:45:00Z",
+    "totalDonors": 3,
+    "geocodingStatus": "complete-approximate",
+    "notes": "All donors have coordinates. DONR002 and DONR003 use approximate coordinates and should be verified with Kakao/Naver Maps API for precise location."
+  },
+  "donors": [
+    {
+      "id": "DONR001",
+      "name": "광명시청",
+      "type": "Government",
+      "primaryContact": "김서연",
+      "email": "donation@gm.go.kr",
+      "phone": "02-000-1111",
+      "address": "경기도 광명시 시청로 20",
+      "coordinates": {
+        "lat": 37.4784878,
+        "lng": 126.8642888
+      },
+      "preferredCommunication": "Email",
+      "notes": "월간 기부 일정"
+    },
+    {
+      "id": "DONR002",
+      "name": "익명의 기부자",
+      "type": "Individual",
+      "primaryContact": "",
+      "email": "",
+      "phone": "010-7777-8888",
+      "address": "경기도 광명시 오리로 362",
+      "coordinates": {
+        "lat": 37.4211,
+        "lng": 126.8675,
+        "geocoded": false,
+        "note": "Approximate coordinates for Soha-dong area - needs Kakao/Naver Maps verification"
+      },
+      "preferredCommunication": "SMS",
+      "notes": "연말 집중 기부"
+    },
+    {
+      "id": "DONR003",
+      "name": "한빛제과",
+      "type": "Corporate",
+      "primaryContact": "박찬호",
+      "email": "phpark@hanbit.com",
+      "phone": "02-123-4567",
+      "address": "경기도 광명시 도덕로 16",
+      "coordinates": {
+        "lat": 37.4762,
+        "lng": 126.8615,
+        "geocoded": false,
+        "note": "Approximate coordinates - needs Kakao Maps API verification"
+      },
+      "preferredCommunication": "Phone",
+      "notes": "제과류 정기 후원"
+    }
+  ]
+}
