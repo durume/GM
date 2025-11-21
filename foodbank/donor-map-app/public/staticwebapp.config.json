@@ -1,11 +1,24 @@
 {
   "navigationFallback": {
-    "rewrite": "/index.html"
+    "rewrite": "/index.html",
+    "exclude": ["/assets/*", "/images/*", "/api/*"]
   },
   "routes": [
     {
       "route": "/api/*",
       "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/assets/*.js",
+      "headers": {
+        "Content-Type": "text/javascript; charset=utf-8"
+      }
+    },
+    {
+      "route": "/assets/*.css",
+      "headers": {
+        "Content-Type": "text/css; charset=utf-8"
+      }
     }
   ],
   "mimeTypes": {
@@ -20,6 +33,9 @@
     ".ico": "image/x-icon",
     ".woff": "font/woff",
     ".woff2": "font/woff2"
+  },
+  "globalHeaders": {
+    "X-Content-Type-Options": "nosniff"
   },
   "platform": {
     "apiRuntime": "node:18"
