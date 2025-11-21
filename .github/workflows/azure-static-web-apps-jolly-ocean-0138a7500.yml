@@ -31,6 +31,7 @@ jobs:
           app_location: "foodbank/donor-map-app" # App source code path
           # api_location: "foodbank/donor-map-app/api" # Api source code path - optional (temporarily disabled to test MIME type fix)
           output_location: "dist" # Built app content directory - optional
+          skip_app_build: true # Skip build, use pre-built dist folder
           ###### End of Repository/Build Configurations ######
         env:
           VITE_MAPBOX_TOKEN: ${{ secrets.VITE_MAPBOX_TOKEN }}
