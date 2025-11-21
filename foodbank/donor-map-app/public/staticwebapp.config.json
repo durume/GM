@@ -11,13 +11,33 @@
     {
       "route": "/assets/*.js",
       "headers": {
-        "content-type": "application/javascript; charset=utf-8",
+        "content-type": "text/javascript; charset=utf-8",
         "cache-control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "route": "/assets/*.mjs",
+      "headers": {
+        "content-type": "text/javascript; charset=utf-8",
+        "cache-control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "route": "/*.js",
+      "headers": {
+        "content-type": "text/javascript; charset=utf-8"
+      }
+    },
+    {
+      "route": "/*.mjs",
+      "headers": {
+        "content-type": "text/javascript; charset=utf-8"
       }
     },
     {
       "route": "/assets/*.css",
       "headers": {
+        "content-type": "text/css; charset=utf-8",
         "cache-control": "public, max-age=31536000, immutable"
       }
     },
@@ -29,8 +49,17 @@
     }
   ],
   "mimeTypes": {
-    ".js": "application/javascript",
-    ".json": "application/json"
+    ".js": "text/javascript",
+    ".mjs": "text/javascript",
+    ".json": "application/json",
+    ".css": "text/css",
+    ".svg": "image/svg+xml",
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".ico": "image/x-icon",
+    ".woff": "font/woff",
+    ".woff2": "font/woff2"
   },
   "platform": {
     "apiRuntime": "node:18"
