@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import KakaoMap from '../components/KakaoMap';
+import ErrorBoundary from '../components/ErrorBoundary';
 import type { DonorData } from '../types/donor';
 import donorDataRaw from '../data/donors.json';
 
@@ -56,7 +57,7 @@ const KakaoPage = () => {
           </p>
         </div>
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/maps/mapbox')}
           style={{
             padding: '10px 20px',
             backgroundColor: '#3B82F6',
@@ -92,11 +93,13 @@ const KakaoPage = () => {
       </div>
 
       <div style={{ flex: 1, position: 'relative' }}>
-        <KakaoMap
-          donors={donorData.donors}
-          kakaoApiKey={kakaoApiKey}
-          apiBaseUrl={apiBaseUrl}
-        />
+        <ErrorBoundary>
+          <KakaoMap
+            donors={donorData.donors}
+            kakaoApiKey={kakaoApiKey}
+            apiBaseUrl={apiBaseUrl}
+          />
+        </ErrorBoundary>
       </div>
 
       <footer style={{

@@ -21,11 +21,16 @@ module.exports = async function (context, req) {
         const origin = req.query.origin;
         const destination = req.query.destination;
 
+        // Log request for debugging
+        context.log('Directions API called with:', { origin, destination });
+
         // Validate required parameters
         if (!origin || !destination) {
+            context.log.error('Missing parameters:', { origin, destination });
             context.res.status = 400;
             context.res.body = {
-                error: 'Missing required parameters: origin and destination'
+                error: 'Missing required parameters: origin and destination',
+                received: { origin, destination }
             };
             return;
         }
@@ -35,9 +40,27 @@ module.exports = async function (context, req) {
         const destParts = destination.split(',');
 
         if (originParts.length !== 2 || destParts.length !== 2) {
+            context.log.error('Invalid format:', { origin, destination });
             context.res.status = 400;
             context.res.body = {
-                error: 'Invalid coordinate format. Expected: lng,lat'
+                error: 'Invalid coordinate format. Expected: lng,lat',
+                received: { origin, destination }
+            };
+            return;
+        }
+
+        // Validate coordinates are numbers
+        const originLng = parseFloat(originParts[0]);
+        const originLat = parseFloat(originParts[1]);
+        const destLng = parseFloat(destParts[0]);
+        const destLat = parseFloat(destParts[1]);
+
+        if (isNaN(originLng) || isNaN(originLat) || isNaN(destLng) || isNaN(destLat)) {
+            context.log.error('Invalid coordinates:', { origin, destination });
+            context.res.status = 400;
+            context.res.body = {
+                error: 'Coordinates must be valid numbers',
+                received: { origin, destination }
             };
             return;
         }

@@ -13,24 +13,31 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   padding: 0;
   min-width: 320px;
   min-height: 100vh;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 #root {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
+  width: 100%;
+  min-height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 a {
   font-weight: 500;
   color: #3B82F6;
   text-decoration: inherit;
+  transition: color 200ms ease-in-out;
 }
 
 a:hover {
@@ -38,13 +45,55 @@ a:hover {
   text-decoration: underline;
 }
 
+a:focus-visible {
+  outline: 2px solid #F59E0B;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 button {
   font-family: inherit;
   cursor: pointer;
+  transition: all 200ms ease-in-out;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
 }
 
 button:focus,
 button:focus-visible {
-  outline: 2px solid #3B82F6;
+  outline: 2px solid #F59E0B;
   outline-offset: 2px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Improved Focus Styles for Accessibility */
+*:focus-visible {
+  outline: 2px solid #F59E0B;
+  outline-offset: 2px;
+}
+
+/* Remove default focus outline for mouse users */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Selection Color */
+::selection {
+  background-color: #FEF3C7;
+  color: #92400E;
+}
+
+::-moz-selection {
+  background-color: #FEF3C7;
+  color: #92400E;
 }

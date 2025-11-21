@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DonorMap from '../components/DonorMap';
 import FilterControls from '../components/FilterControls';
+import ErrorBoundary from '../components/ErrorBoundary';
 import type { DonorType, DonorData } from '../types/donor';
 import donorDataRaw from '../data/donors.json';
 
@@ -80,7 +81,7 @@ const MapboxPage = () => {
           </p>
         </div>
         <button
-          onClick={() => navigate('/kakao')}
+          onClick={() => navigate('/maps/kakao')}
           style={{
             padding: '10px 20px',
             backgroundColor: '#FEE500',
@@ -125,11 +126,13 @@ const MapboxPage = () => {
       </div>
 
       <div style={{ flex: 1, position: 'relative' }}>
-        <DonorMap
-          donors={filteredDonors}
-          mapboxToken={mapboxToken}
-          onMapReady={setMapActions}
-        />
+        <ErrorBoundary>
+          <DonorMap
+            donors={filteredDonors}
+            mapboxToken={mapboxToken}
+            onMapReady={setMapActions}
+          />
+        </ErrorBoundary>
       </div>
     </div>
   );

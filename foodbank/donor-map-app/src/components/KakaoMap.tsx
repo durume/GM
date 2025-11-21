@@ -220,15 +220,33 @@ const KakaoMap = ({ donors, kakaoApiKey, apiBaseUrl }: KakaoMapProps) => {
 
     try {
       // Call our secure Azure Function proxy instead of Kakao API directly
-      const response = await fetch(
-        `${apiBaseUrl}/directions?origin=${userLocation.lng},${userLocation.lat}&destination=${selectedDonor.coordinates.lng},${selectedDonor.coordinates.lat}`
-      );
+      const url = `${apiBaseUrl}/directions?origin=${userLocation.lng},${userLocation.lat}&destination=${selectedDonor.coordinates.lng},${selectedDonor.coordinates.lat}`;
+      console.log('KakaoMap: Calling directions API:', url);
+
+      const response = await fetch(url);
+      console.log('KakaoMap: Response status:', response.status);
+      console.log('KakaoMap: Response headers:', response.headers.get('content-type'));
 
       if (!response.ok) {
-        throw new Error('경로를 찾을 수 없습니다.');
+        let errorData;
+        const contentType = response.headers.get('content-type');
+        try {
+          if (contentType && contentType.includes('application/json')) {
+            errorData = await response.json();
+          } else {
+            const text = await response.text();
+            errorData = { error: text || `HTTP ${response.status}` };
+          }
+        } catch (parseError) {
+          console.error('KakaoMap: Error parsing error response:', parseError);
+          errorData = { error: `HTTP ${response.status}` };
+        }
+        console.error('KakaoMap: API error:', errorData);
+        throw new Error(errorData.error || '경로를 찾을 수 없습니다.');
       }
 
       const data = await response.json();
+      console.log('KakaoMap: Route data received:', data);
 
       if (data.routes && data.routes.length > 0) {
         const route = data.routes[0];
