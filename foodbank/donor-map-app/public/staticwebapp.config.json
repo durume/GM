@@ -1,7 +1,7 @@
 {
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/assets/*", "/images/*", "/api/*"]
+    "exclude": ["/assets/*", "/images/*", "/api/*", "/*.{js,css,png,jpg,svg,ico,json}"]
   },
   "routes": [
     {
@@ -11,13 +11,40 @@
     {
       "route": "/assets/*.js",
       "headers": {
-        "Content-Type": "text/javascript; charset=utf-8"
+        "content-type": "text/javascript; charset=utf-8",
+        "cache-control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "route": "/assets/*.mjs",
+      "headers": {
+        "content-type": "text/javascript; charset=utf-8",
+        "cache-control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "route": "/*.js",
+      "headers": {
+        "content-type": "text/javascript; charset=utf-8"
+      }
+    },
+    {
+      "route": "/*.mjs",
+      "headers": {
+        "content-type": "text/javascript; charset=utf-8"
       }
     },
     {
       "route": "/assets/*.css",
       "headers": {
-        "Content-Type": "text/css; charset=utf-8"
+        "content-type": "text/css; charset=utf-8",
+        "cache-control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "route": "/index.html",
+      "headers": {
+        "cache-control": "no-cache, no-store, must-revalidate"
       }
     }
   ],
@@ -34,10 +61,10 @@
     ".woff": "font/woff",
     ".woff2": "font/woff2"
   },
-  "globalHeaders": {
-    "X-Content-Type-Options": "nosniff"
-  },
   "platform": {
     "apiRuntime": "node:18"
+  },
+  "globalHeaders": {
+    "X-Content-Type-Options": "nosniff"
   }
 }
