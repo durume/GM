@@ -1,51 +1,11 @@
 {
   "navigationFallback": {
-    "rewrite": "/index.html",
-    "exclude": ["/assets/*", "/images/*", "/api/*", "/*.{js,css,png,jpg,svg,ico,json}"]
+    "rewrite": "/index.html"
   },
   "routes": [
     {
       "route": "/api/*",
       "allowedRoles": ["anonymous"]
-    },
-    {
-      "route": "/assets/*.js",
-      "headers": {
-        "content-type": "text/javascript; charset=utf-8",
-        "cache-control": "public, max-age=31536000, immutable"
-      }
-    },
-    {
-      "route": "/assets/*.mjs",
-      "headers": {
-        "content-type": "text/javascript; charset=utf-8",
-        "cache-control": "public, max-age=31536000, immutable"
-      }
-    },
-    {
-      "route": "/*.js",
-      "headers": {
-        "content-type": "text/javascript; charset=utf-8"
-      }
-    },
-    {
-      "route": "/*.mjs",
-      "headers": {
-        "content-type": "text/javascript; charset=utf-8"
-      }
-    },
-    {
-      "route": "/assets/*.css",
-      "headers": {
-        "content-type": "text/css; charset=utf-8",
-        "cache-control": "public, max-age=31536000, immutable"
-      }
-    },
-    {
-      "route": "/index.html",
-      "headers": {
-        "cache-control": "no-cache, no-store, must-revalidate"
-      }
     }
   ],
   "mimeTypes": {
@@ -63,8 +23,5 @@
   },
   "platform": {
     "apiRuntime": "node:18"
-  },
-  "globalHeaders": {
-    "X-Content-Type-Options": "nosniff"
   }
 }
