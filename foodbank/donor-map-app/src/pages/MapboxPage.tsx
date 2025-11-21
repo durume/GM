@@ -80,25 +80,46 @@ const MapboxPage = () => {
             후원자 위치 지도 (3D 지형 지원)
           </p>
         </div>
-        <button
-          onClick={() => navigate('/maps/kakao')}
-          style={{
-            padding: '10px 20px',
-            backgroundColor: '#FEE500',
-            color: '#000',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: 'bold',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            transition: 'all 0.2s'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#FDD835'}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FEE500'}
-        >
-          🗺️ 카카오맵으로 보기
-        </button>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button
+            onClick={() => navigate('/')}
+            style={{
+              padding: '10px 20px',
+              backgroundColor: '#10B981',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#059669'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#10B981'}
+          >
+            🏠 홈으로 가기
+          </button>
+          <button
+            onClick={() => navigate('/maps/kakao')}
+            style={{
+              padding: '10px 20px',
+              backgroundColor: '#FEE500',
+              color: '#000',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#FDD835'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FEE500'}
+          >
+            🗺️ 카카오맵으로 보기
+          </button>
+        </div>
       </header>
 
       {/* Demo Disclaimer Banner */}

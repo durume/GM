@@ -56,25 +56,46 @@ const KakaoPage = () => {
             후원자 위치 지도 (한국 주소 최적화)
           </p>
         </div>
-        <button
-          onClick={() => navigate('/maps/mapbox')}
-          style={{
-            padding: '10px 20px',
-            backgroundColor: '#3B82F6',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: 'bold',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            transition: 'all 0.2s'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2563EB'}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3B82F6'}
-        >
-          🏔️ Mapbox 3D로 보기
-        </button>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button
+            onClick={() => navigate('/')}
+            style={{
+              padding: '10px 20px',
+              backgroundColor: '#10B981',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#059669'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#10B981'}
+          >
+            🏠 홈으로 가기
+          </button>
+          <button
+            onClick={() => navigate('/maps/mapbox')}
+            style={{
+              padding: '10px 20px',
+              backgroundColor: '#3B82F6',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2563EB'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3B82F6'}
+          >
+            🏔️ Mapbox 3D로 보기
+          </button>
+        </div>
       </header>
 
       {/* Demo Disclaimer Banner */}
