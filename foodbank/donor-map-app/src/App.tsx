@@ -10,9 +10,12 @@ import MapboxPage from './pages/MapboxPage';
 import KakaoPage from './pages/KakaoPage';
 import './App.css';
 
+// Get basename from Vite's base URL config
+const basename = import.meta.env.BASE_URL.replace(/\/$/, '') || '/';
+
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={basename}>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<AboutPage />} />
