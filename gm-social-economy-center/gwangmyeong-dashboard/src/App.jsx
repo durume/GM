@@ -122,7 +122,7 @@ export default function App() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           <StatCard
             title="전체 기업"
             value={stats?.total || 0}
@@ -136,13 +136,6 @@ export default function App() {
             icon="users"
             color="violet"
             subtitle="5개 유형"
-          />
-          <StatCard
-            title="활동 지역"
-            value={Object.keys(stats?.regionCount || {}).length}
-            icon="mapPin"
-            color="green"
-            subtitle="광명시 내"
           />
           <StatCard
             title="최다 유형"
