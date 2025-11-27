@@ -8,7 +8,8 @@ const donorData = donorDataRaw as DonorData;
 
 const KakaoPage = () => {
   const kakaoApiKey = import.meta.env.VITE_KAKAO_API_KEY;
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+  // API base URL - defaults to /api for Azure, can be set to Cloudflare Worker URL for GitHub Pages
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '/api';
   const navigate = useNavigate();
 
   if (!kakaoApiKey) {

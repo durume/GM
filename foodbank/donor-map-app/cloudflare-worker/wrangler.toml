@@ -1,0 +1,14 @@
+name = "gm-foodbank-directions-api"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+# Account ID - Get this from your Cloudflare dashboard
+# account_id = "your-account-id-here"
+
+# Environment variables (secrets should be set via `wrangler secret put`)
+# Run: wrangler secret put KAKAO_REST_API_KEY
+# Then enter your Kakao REST API key when prompted
+
+[vars]
+# Non-sensitive variables can go here
+ENVIRONMENT = "production"
