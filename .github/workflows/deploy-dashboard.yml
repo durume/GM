@@ -7,6 +7,10 @@ on:
       - 'gm-social-economy-center/gwangmyeong-dashboard/**'
   workflow_dispatch:
 
+permissions:
+  contents: write
+  pages: write
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
