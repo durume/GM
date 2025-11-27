@@ -4,8 +4,8 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  // Base URL for GitHub Pages deployment (https://durume.github.io/GM/)
-  base: process.env.GITHUB_PAGES === 'true' ? '/GM/' : '/',
+  // Base URL for GitHub Pages deployment (https://durume.github.io/GM/foodbank/)
+  base: process.env.GITHUB_PAGES === 'true' ? '/GM/foodbank/' : '/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',

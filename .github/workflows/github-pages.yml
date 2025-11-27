@@ -45,13 +45,18 @@ jobs:
           VITE_API_BASE_URL: ${{ secrets.CLOUDFLARE_WORKER_URL }}
         run: npx vite build
 
+      - name: Create subdirectory structure
+        run: |
+          mkdir -p _site/foodbank
+          cp -r foodbank/donor-map-app/dist/* _site/foodbank/
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: foodbank/donor-map-app/dist
+          path: _site
 
   deploy:
     environment:
