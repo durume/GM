@@ -1,0 +1,39 @@
+name: Deploy Dashboard to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'gwangmyeong-dashboard/**'
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: gwangmyeong-dashboard/package-lock.json
+
+      - name: Install dependencies
+        working-directory: gwangmyeong-dashboard
+        run: npm ci
+
+      - name: Build
+        working-directory: gwangmyeong-dashboard
+        run: npm run build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./gwangmyeong-dashboard/dist
+          destination_dir: gm-social-economy-center/dashboard
+          keep_files: true
