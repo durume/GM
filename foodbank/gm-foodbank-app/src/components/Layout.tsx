@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { ReactNode, useState } from 'react';
+import { ReactNode } from 'react';
 import ScrollToTop from './ScrollToTop';
 import {
   colors, shadows, transitions, typography, zIndex, spacing,
@@ -12,7 +12,6 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   const location = useLocation();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
     { path: '/', label: '홈', icon: '🏠' },

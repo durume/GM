@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'foodbank/donor-map-app/**'
+      - 'foodbank/gm-foodbank-app/**'
       - '.github/workflows/github-pages.yml'
   workflow_dispatch:
 
@@ -30,14 +30,14 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
-          cache-dependency-path: foodbank/donor-map-app/package-lock.json
+          cache-dependency-path: foodbank/gm-foodbank-app/package-lock.json
 
       - name: Install dependencies
-        working-directory: foodbank/donor-map-app
+        working-directory: foodbank/gm-foodbank-app
         run: npm ci
 
       - name: Build for GitHub Pages
-        working-directory: foodbank/donor-map-app
+        working-directory: foodbank/gm-foodbank-app
         env:
           GITHUB_PAGES: 'true'
           VITE_MAPBOX_TOKEN: ${{ secrets.VITE_MAPBOX_TOKEN }}
@@ -48,7 +48,7 @@ jobs:
       - name: Create subdirectory structure
         run: |
           mkdir -p _site/foodbank
-          cp -r foodbank/donor-map-app/dist/* _site/foodbank/
+          cp -r foodbank/gm-foodbank-app/dist/* _site/foodbank/
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

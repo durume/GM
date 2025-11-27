@@ -382,7 +382,7 @@ export const components = {
     borderRadius: borderRadius.xl,
     backgroundColor: colors.backgroundAlt,
     boxShadow: shadows.lg,
-    textAlign: 'center',
+    textAlign: 'center' as const,
     border: `2px solid ${colors.neutral[200]}`,
     transition: transitions.medium,
 

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import {
-  colors, spacing, typography, borderRadius, shadows, transitions,
+  colors, spacing, typography, borderRadius, shadows,
   gradients, layout, components
 } from '../theme';
 
