@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
 import ServicesPage from './pages/ServicesPage';
@@ -10,12 +10,9 @@ import MapboxPage from './pages/MapboxPage';
 import KakaoPage from './pages/KakaoPage';
 import './App.css';
 
-// Get basename from Vite's base URL config
-const basename = import.meta.env.BASE_URL.replace(/\/$/, '') || '/';
-
 function App() {
   return (
-    <BrowserRouter basename={basename}>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<AboutPage />} />
@@ -27,7 +24,7 @@ function App() {
         <Route path="/maps/mapbox" element={<MapboxPage />} />
         <Route path="/maps/kakao" element={<KakaoPage />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
