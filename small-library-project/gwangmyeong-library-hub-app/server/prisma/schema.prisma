@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("library_admin") // master_admin, library_admin
+  libraryId String?
+  library   Library? @relation(fields: [libraryId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Library {
+  id               String    @id @default(uuid())
+  name             String
+  type             String    // Public, Private, etc.
+  shortDescription String?
+  description      String?
+  address          String
+  latitude         Float?
+  longitude        Float?
+  phone            String?
+  email            String?
+  homepageUrl      String?
+  instagramUrl     String?
+  blogUrl          String?
+  openingHours     String?   // JSON string
+  closedDays       String?
+  tags             String?   // JSON string or comma separated
+  images           String?   // JSON string of image URLs
+  programs         Program[]
+  admins           User[]
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+model Program {
+  id             String   @id @default(uuid())
+  libraryId      String
+  library        Library  @relation(fields: [libraryId], references: [id])
+  title          String
+  description    String?
+  targetAge      String?  // Child, Teen, Adult, All
+  category       String?  // Reading, Digital, Culture, etc.
+  startDate      DateTime
+  endDate        DateTime?
+  scheduleType   String?  // One-time, Recurring
+  status         String   @default("RECRUITING") // RECRUITING, CLOSED, ONGOING, ENDED
+  capacity       Int?
+  fee            Int      @default(0)
+  contactInfo    String?
+  thumbnailUrl   String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
