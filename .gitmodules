@@ -1,0 +1,6 @@
+[submodule "small-library-project/gm-small-library-app"]
+	path = small-library-project/gm-small-library-app
+	url = https://github.com/mikary78/gwangmyeong-library-hub.git
+[submodule "small-library-project/small-library-biz"]
+	path = small-library-project/small-library-biz
+	url = https://github.com/mikary78/small-business.git
