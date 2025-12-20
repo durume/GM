@@ -1235,6 +1235,105 @@ git push
 
 ---
 
+## 📖 RAG 문서 검색 기능 (NotebookLM 스타일)
+
+### 개요
+
+MCP에 **RAG (Retrieval Augmented Generation)** 기능이 추가되었습니다. 로컬 Google Drive 폴더의 PDF, Word, Excel 문서를 인덱싱하고 의미 기반으로 검색할 수 있습니다.
+
+### 시스템 요구사항
+
+| 구성요소 | 최소 사양 | 권장 사양 |
+|----------|-----------|-----------|
+| **CPU** | 4코어 (i5/Ryzen 5) | 8코어+ (i7/Ryzen 7) |
+| **RAM** | 8GB | 16GB+ |
+| **저장장치** | SSD 10GB 여유 | SSD 50GB+ |
+| **GPU** | 불필요 | NVIDIA 4GB+ VRAM (선택) |
+
+### 사전 준비
+
+#### 1. Ollama 설치
+
+```bash
+# Windows: https://ollama.ai/download 에서 다운로드 후 설치
+
+# 임베딩 모델 설치
+ollama pull nomic-embed-text
+```
+
+#### 2. Google Drive for Desktop 설치 (선택)
+
+로컬 동기화 폴더를 사용하면 별도 인증 없이 파일에 접근할 수 있습니다.
+
+### 새로운 도구
+
+| 도구 | 설명 | 예시 |
+|------|------|------|
+| `index_documents` | 폴더 내 문서 인덱싱 | "G:/내 드라이브/문서 인덱싱해줘" |
+| `search_documents` | 의미 기반 문서 검색 | "사회적기업 지원 정책 문서 찾아줘" |
+| `ask_documents` | 문서 기반 Q&A | "지원 자격 요건이 뭐야?" |
+| `list_documents` | 인덱싱된 문서 목록 | "인덱싱된 문서 목록 보여줘" |
+
+### 사용 예시
+
+```
+# 1. 문서 인덱싱
+"G:/내 드라이브/사회적경제 폴더를 인덱싱해줘"
+
+# 2. 문서 검색
+"협동조합 설립 관련 문서 찾아줘"
+"2024년 사업 보고서 검색해줘"
+
+# 3. 문서 기반 Q&A
+"정책 문서에서 마을기업 지원 자격이 뭐야?"
+"작년 보고서에서 주요 성과 알려줘"
+
+# 4. 문서 목록
+"인덱싱된 PDF 파일 목록 보여줘"
+```
+
+### 지원 파일 형식
+
+| 형식 | 확장자 | 설명 |
+|------|--------|------|
+| PDF | `.pdf` | 텍스트 추출 |
+| Word | `.docx`, `.doc` | 텍스트 추출 |
+| Excel | `.xlsx`, `.xls` | 모든 시트 텍스트 추출 |
+
+### 설정 변경
+
+`src/config/rag.config.ts` 파일에서 설정을 변경할 수 있습니다:
+
+```typescript
+export const RAGConfig = {
+  // Google Drive 폴더 경로
+  driveFolderPath: "G:/내 드라이브",
+
+  // Ollama 설정
+  ollama: {
+    baseUrl: "http://localhost:11434",
+    embeddingModel: "nomic-embed-text",
+  },
+
+  // 청킹 설정
+  chunking: {
+    chunkSize: 500,
+    chunkOverlap: 50,
+  },
+};
+```
+
+### 문제 해결
+
+| 증상 | 원인 | 해결 방법 |
+|------|------|----------|
+| "Ollama 연결 실패" | Ollama 미실행 | `ollama serve` 실행 |
+| "모델을 찾을 수 없음" | 모델 미설치 | `ollama pull nomic-embed-text` |
+| 인덱싱이 느림 | 문서가 많음/RAM 부족 | 더 적은 문서로 테스트 |
+| 검색 결과 없음 | 인덱싱 안됨 | `index_documents` 먼저 실행 |
+
+---
+
 ## 📊 데이터 출처
 
 - **기업 데이터**: [광명시사회적경제센터](https://gmsocial.or.kr/map) (2024년 11월 기준)

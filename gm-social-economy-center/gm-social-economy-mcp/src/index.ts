@@ -24,10 +24,16 @@ import {
   ReadResourceRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 
-// 도구 임포트
+// 기존 도구 임포트
 import { searchEnterprises, searchEnterprisesTool } from "./tools/searchEnterprises.js";
 import { getStatistics, getStatisticsTool } from "./tools/getStatistics.js";
 import { generateReport, generateReportTool } from "./tools/generateReport.js";
+
+// RAG 도구 임포트
+import { indexDocuments, indexDocumentsTool } from "./tools/indexDocuments.js";
+import { searchDocuments, searchDocumentsTool } from "./tools/searchDocuments.js";
+import { askDocuments, askDocumentsTool } from "./tools/askDocuments.js";
+import { listDocuments, listDocumentsTool } from "./tools/listDocuments.js";
 
 // 데이터 임포트
 import { loadMetadata, validateData } from "./data/loader.js";
@@ -64,9 +70,15 @@ const server = new Server(
 server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [
+      // 기존 사회적경제 기업 도구
       searchEnterprisesTool,
       getStatisticsTool,
       generateReportTool,
+      // RAG 문서 검색 도구
+      indexDocumentsTool,
+      searchDocumentsTool,
+      askDocumentsTool,
+      listDocumentsTool,
     ],
   };
 });
@@ -84,6 +96,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request): Promise<{
 
   try {
     switch (name) {
+      // 기존 사회적경제 기업 도구
       case "search_enterprises":
         return await searchEnterprises(args as any);
 
@@ -92,6 +105,19 @@ server.setRequestHandler(CallToolRequestSchema, async (request): Promise<{
 
       case "generate_report":
         return await generateReport(args as any);
+
+      // RAG 문서 검색 도구
+      case "index_documents":
+        return await indexDocuments(args as any);
+
+      case "search_documents":
+        return await searchDocuments(args as any);
+
+      case "ask_documents":
+        return await askDocuments(args as any);
+
+      case "list_documents":
+        return await listDocuments(args as any);
 
       default:
         return {
@@ -206,6 +232,7 @@ async function main(): Promise<void> {
   // 시작 로그 (stderr로 출력하여 stdout 통신에 영향 없도록)
   console.error("🚀 GM Social Economy MCP Server started");
   console.error(`📊 ${validation.message}`);
+  console.error("📚 RAG 문서 검색 기능이 활성화되었습니다.");
 }
 
 // 서버 실행
