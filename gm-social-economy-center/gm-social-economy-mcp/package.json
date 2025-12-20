@@ -1,0 +1,49 @@
+{
+  "name": "gm-social-economy-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for Gwangmyeong Social Economy Center - helps public officers search enterprises, generate statistics, and create reports",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "social-economy",
+    "gwangmyeong",
+    "korea",
+    "ai-tools"
+  ],
+  "author": "durume",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/durume/GM.git",
+    "directory": "gm-social-economy-mcp"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc && npm run copy-data",
+    "copy-data": "node -e \"require('fs').cpSync('src/data/enterprises.json', 'dist/data/enterprises.json')\"",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "rebuild": "npm run clean && npm run build",
+    "inspect": "npx @modelcontextprotocol/inspector node dist/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist",
+    "src/data/enterprises.json",
+    "README.md",
+    "LICENSE"
+  ]
+}
