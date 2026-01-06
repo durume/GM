@@ -1,0 +1,45 @@
+.header {
+    height: var(--header-height);
+    border-bottom: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.05em;
+}
+
+.highlight {
+    color: var(--primary);
+}
+
+.nav {
+    display: flex;
+    gap: 2rem;
+}
+
+.navLink {
+    font-weight: 500;
+    color: var(--muted);
+}
+
+.navLink:hover {
+    color: var(--foreground);
+}
+
+.actions {
+    display: flex;
+    gap: 1rem;
+}
