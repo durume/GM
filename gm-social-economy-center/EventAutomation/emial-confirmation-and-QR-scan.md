@@ -45,8 +45,9 @@
 
 하단 + 버튼을 눌러 시트를 추가하고 이름을 ScanLogs로 변경합니다.
 - A1: ID
-- B1: 스캔된이메일
-- C1: 스캔시간
+- B1: 스캔된성명
+- C1: 스캔된연락처
+- D1: 스캔시간
 
 2. QR 생성 및 메일 발송 스크립트 작성
 
@@ -57,6 +58,7 @@
 // --- 공통 설정 (Configuration) ---
 // 0:Time, 1:성명, 2:소속, 3:연락처, 4:이메일 ...
 const NAME_INDEX = 1;   // B열
+const PHONE_INDEX = 3;  // D열
 const EMAIL_INDEX = 4;  // E열
 
 // 저장 위치 (1부터 시작: J=10, M=13)
@@ -86,15 +88,23 @@ function sendEventConfirmation(e) {
   try {
     const responses = e.values;
     const userName = responses[NAME_INDEX];
+    const userPhone = responses[PHONE_INDEX];
     const userEmail = responses[EMAIL_INDEX];
 
-    // 이메일 유효성 검사
+    // 필수 정보 유효성 검사
+    if (!userName || !userPhone) {
+      console.error("필수 정보 누락 - 성명: " + userName + ", 연락처: " + userPhone);
+      return;
+    }
+
     if (!userEmail || !userEmail.includes('@')) {
       console.error("유효하지 않은 이메일: " + userEmail);
       return;
     }
 
-    const qrImageUrl = generateQRCode(userEmail);
+    // QR 코드 데이터: 성명|연락처 형식
+    const qrData = userName + "|" + userPhone;
+    const qrImageUrl = generateQRCode(qrData);
 
     // 시트에 QR 저장 (getActiveSheet 대신 명시적으로 시트 이름 지정)
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form Responses 1");
@@ -256,20 +266,71 @@ function sendEmail(to, name, qrUrl, type) {
 - Initial value (수식 아이콘): =UNIQUEID() 입력
 - Show?: 체크 해제 (화면에 안 보이게 숨김)
 
-3. 스캔된이메일:
-- Type: Ref (중요: 모바일 스캔 버튼 오류 방지를 위해 Ref 사용)
-- Source table: Form Responses 1 (참가자 명단 테이블 선택)
+3. 스캔된성명:
+- Type: Text
 - [Scan] 기능 켜기:
   - 컬럼 왼쪽 연필 아이콘(Edit) 클릭
   - 설정 창 아래쪽 Other Properties 섹션 클릭 (펼치기)
   - Scannable 항목 체크 ✅
   - 상단 Done 클릭
-- [중복 방지] 설정:
-  - 다시 연필 아이콘 클릭 > Data Validity 섹션 클릭
-  - Valid If 수식 입력: ```LOOKUP([_THIS], "Form Responses 1", "이메일", "출석여부") <> "출석완료"``` (주의: "Form Responses 1" 부분은 실제 앱 내 테이블 이름이어야 합니다.)
-  - Invalid value error 입력: "이미 입장한 참가자입니다."
+- [자동 추출] 설정:
+  - Initial value 수식: ```SPLIT([_THISROW].[스캔데이터], "|")[0]```
+  - (QR 코드의 "성명|연락처" 형식에서 성명 부분만 추출)
 
-4. 스캔시간:
+4. 스캔된연락처:
+- Type: Phone
+- Initial value 수식: ```SPLIT([_THISROW].[스캔데이터], "|")[1]```
+- (QR 코드에서 연락처 부분 추출)
+
+5. 스캔시간:
+- Type: DateTime
+- Initial value: =NOW() 입력
+
+**중요**: 실제로는 QR 코드를 스캔할 때 "성명|연락처" 형식의 텍스트가 "스캔된성명" 컬럼에 입력됩니다. AppSheet의 Scannable 기능은 한 컬럼에만 적용되므로, 아래 방식으로 설정을 변경하겠습니다:
+
+**수정된 설정 (권장):**
+
+3. 스캔된성명:
+- Type: Text
+- [Scan] 기능 켜기 (위와 동일)
+- **이 컬럼에 "성명|연락처" 전체가 저장됩니다**
+- [중복 방지] 설정:
+  - 컬럼 편집 > Data Validity 섹션 클릭
+  - Valid If 수식 입력:
+    ```
+    ISBLANK(
+      LOOKUP(
+        SPLIT([_THIS], "|")[0],
+        "Form Responses 1",
+        "성명",
+        "출석여부"
+      )
+    ) OR
+    LOOKUP(
+      SPLIT([_THIS], "|")[0],
+      "Form Responses 1",
+      "성명",
+      "출석여부"
+    ) <> "출석완료"
+    ```
+  - Invalid value error 입력: "이미 출석 처리된 참가자입니다."
+  - (QR 코드에서 성명을 추출하여 이미 출석한 사람인지 확인)
+
+4. 스캔된연락처:
+- Type: Text
+- Initial value 수식: ```SPLIT([스캔된성명], "|")[1]```
+- App formula 체크 ✅
+- (스캔된성명에서 연락처 부분만 추출)
+
+5. 참가자찾기:
+- Type: Ref
+- Source table: Form Responses 1
+- Referenced column: 성명
+- App formula: ```SPLIT([스캔된성명], "|")[0]```
+- App formula 체크 ✅
+- Show?: 체크 해제 (숨김)
+
+6. 스캔시간:
 - Type: DateTime
 - Initial value: =NOW() 입력
 
@@ -298,10 +359,12 @@ function sendEmail(to, name, qrUrl, type) {
 - **Do this**: `Data: execute an action on a set of rows` 선택
 - 추가 설정 필드가 나타나면:
   - **Referenced Table**: `Form Responses 1`
-  - **Referenced Rows**: `LIST([스캔된이메일])`
+  - **Referenced Rows**: `LIST([참가자찾기])`
   - **Referenced Action**: `출석상태변경` (위에서 만든 액션 선택)
 - **Display** 섹션:
   - **Prominence**: `Do not display`
+
+**설명**: QR 코드 스캔 시 "성명|연락처" 데이터가 스캔되면, `참가자찾기` Ref 컬럼이 성명을 기준으로 Form Responses 1 테이블에서 해당 참가자를 찾아 출석 처리합니다.
 
 ### 4. 스캐너 화면 만들기 (왼쪽 메뉴 'UX')
 1. 왼쪽 메뉴에서 **UX** 탭 클릭
@@ -320,9 +383,20 @@ function sendEmail(to, name, qrUrl, type) {
 **참고**: 2025년 AppSheet에서는 Auto save 옵션이 기본적으로 활성화되어 있으며, Form Saved 이벤트를 통해 저장 후 동작을 제어합니다.
 
 # ✅ 최종 사용 방법
+
+## QR 코드 데이터 형식
+- 생성되는 QR 코드에는 **"성명|연락처"** 형식으로 데이터가 저장됩니다
+- 예: "홍길동|010-1234-5678"
+- 이를 통해 동명이인 구분 및 참가자 확인이 가능합니다
+
+## 앱 사용 방법
 1. 상단 [Save] 버튼을 눌러 앱을 저장합니다.
 2. 스마트폰에 AppSheet 앱을 설치하고 로그인합니다.
 3. 만들어진 앱을 실행하고 [스캐너] 메뉴로 들어갑니다.
-4. [스캔된이메일] 입력창을 터치하면 참가자 목록이 뜹니다.
-5. 목록 상단 검색창 안쪽에 있는 **[QR 코드 아이콘]**을 누릅니다.
-6. 참가자의 QR 코드를 비추면 자동으로 저장되고 출석 처리가 완료됩니다.
+4. [스캔된성명] 입력창을 터치합니다.
+5. 입력창 내부의 **[QR 코드 아이콘]**을 누릅니다.
+6. 참가자의 QR 코드를 비추면:
+   - "성명|연락처" 데이터가 자동으로 스캔됩니다
+   - 성명을 기준으로 참가자를 찾습니다
+   - 자동으로 출석 처리가 완료됩니다
+   - 다시 스캐너 화면으로 돌아가 다음 참가자를 스캔할 수 있습니다
