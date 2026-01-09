@@ -42,3 +42,6 @@ coverage/
 *.tmp
 *.temp
 ~$*
+
+#Ollama
+OllamaSetup.exe
