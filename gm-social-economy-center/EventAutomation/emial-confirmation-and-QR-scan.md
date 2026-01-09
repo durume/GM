@@ -268,56 +268,109 @@ function sendEmail(to, name, qrUrl, type) {
 
 3. 스캔된성명:
 - Type: Text
+- Initial value: 비워둠 (사용자가 QR 스캔으로 직접 입력)
 - [Scan] 기능 켜기:
   - 컬럼 왼쪽 연필 아이콘(Edit) 클릭
   - 설정 창 아래쪽 Other Properties 섹션 클릭 (펼치기)
   - Scannable 항목 체크 ✅
   - 상단 Done 클릭
 - **이 컬럼에 QR 스캔 시 "성명|연락처" 전체가 저장됩니다**
-- [중복 방지] 설정:
+
+**⚠️ 중요**: QR 스캔 기능(카메라 아이콘)은 **스마트폰의 AppSheet 앱에서만** 나타납니다. 웹 브라우저의 Preview나 PC에서는 카메라 아이콘이 보이지 않으므로, 반드시 모바일 기기에서 테스트하세요.
+
+- [중복 방지] 설정 (선택사항):
   - 컬럼 편집 > Data Validity 섹션 클릭
   - Valid If 수식 입력:
     ```
-    ISBLANK(
-      LOOKUP(
-        SPLIT([_THIS], "|")[0],
-        "Form Responses 1",
-        "성명",
-        "출석여부"
-      )
-    ) OR
-    LOOKUP(
-      SPLIT([_THIS], "|")[0],
-      "Form Responses 1",
-      "성명",
-      "출석여부"
-    ) <> "출석완료"
+    OR(
+      ISBLANK([_THIS]),
+      COUNT(
+        SELECT(Form Responses 1[성명],
+          AND(
+            [성명] = INDEX(SPLIT([_THIS], "|"), 1),
+            [연락처] = INDEX(SPLIT([_THIS], "|"), 2),
+            [출석여부] = "출석완료"
+          )
+        )
+      ) = 0
+    )
     ```
   - Invalid value error 입력: "이미 출석 처리된 참가자입니다."
-  - (QR 코드에서 성명을 추출하여 이미 출석한 사람인지 확인)
+
+**수식 설명:**
+- `OR(조건1, 조건2)`: 조건1 또는 조건2 중 하나라도 참이면 입력 허용
+- 조건1: `ISBLANK([_THIS])` - 빈 값이면 허용 (취소할 때)
+- 조건2: `COUNT(...) = 0` - 이미 출석한 기록이 0건이면 허용
+  - `INDEX(SPLIT([_THIS], "|"), 1)`: QR 코드에서 성명 추출 (예: "홍길동|010-1234-5678" → "홍길동")
+  - `INDEX(SPLIT([_THIS], "|"), 2)`: QR 코드에서 연락처 추출 (예: "홍길동|010-1234-5678" → "010-1234-5678")
+  - `SELECT(...)`: Form Responses 1에서 **성명과 연락처 둘 다 일치하고** 출석완료인 사람 찾기
+  - 출석완료 기록이 0건 = 아직 출석 안 함 = 입력 허용
+
+**중요:** 동명이인(같은 이름)이 있을 경우를 대비하여 성명과 연락처를 모두 확인합니다.
+
+**더 간단한 방식 (권장):**
+중복 방지를 생략하고, 대신 참가자 화면에서 "출석여부" 컬럼을 표시하여 육안으로 확인하는 것도 좋습니다. Valid If를 생략하려면 이 설정을 건너뛰세요.
 
 4. 스캔된연락처:
 - Type: Text
-- Formula:
-  - Initial value 수식: ```SPLIT([스캔된성명], "|")[1]```
-  - App formula 체크 ✅
-- (스캔된성명 컬럼에서 "|" 뒤의 연락처 부분만 자동 추출)
-- Editable?: 체크 해제 (자동 계산 컬럼)
+- Formula 섹션:
+  - **Initial value**: ```INDEX(SPLIT([스캔된성명], "|"), 2)```
+  - **App formula**: 비워두기 (Google Sheets의 실제 컬럼이므로)
+- (스캔된성명 컬럼에서 "|" 뒤의 연락처 부분만 자동 추출하여 Sheets에 저장)
+- Editable?: 체크 해제
+
+**참고**: Initial value는 데이터베이스에 저장되는 컬럼, App formula는 가상 컬럼(저장 안 됨)
 
 5. 참가자찾기:
 - Type: Ref
 - Source table: Form Responses 1
-- Referenced column: 성명 (Form Responses 1 테이블의 성명 컬럼)
-- Formula:
-  - Initial value: ```SPLIT([스캔된성명], "|")[0]```
-  - App formula 체크 ✅
-- (스캔된성명에서 "|" 앞의 성명만 추출하여 참가자 검색)
+- **Referenced column은 나타나지 않습니다 (App formula를 사용할 때는 수식이 대신 참조를 결정합니다)**
+- Formula 섹션 (이 설정이 중요합니다!):
+  - **Initial value**: 비워두기
+  - **App formula**: 다음 수식 입력
+    ```
+    ANY(
+      SELECT(Form Responses 1[성명],
+        AND(
+          [성명] = INDEX(SPLIT([스캔된성명], "|"), 1),
+          [연락처] = INDEX(SPLIT([스캔된성명], "|"), 2)
+        )
+      )
+    )
+    ```
+- (스캔된성명에서 성명과 연락처를 모두 추출하여 정확한 참가자 검색)
 - Show?: 체크 해제 (숨김 - 내부 로직용)
+- Editable?: 자동으로 체크 해제됨 (Virtual Column이므로)
+
+**설정 순서:**
+1. Type을 Ref로 선택
+2. Source table을 Form Responses 1로 선택
+3. Formula 섹션에서 **App formula 필드**에 위 수식 입력 (Initial value는 비워둠)
+4. Show를 체크 해제
+
+**중요 참고사항:**
+- **App formula**에 수식을 입력하면 이 컬럼은 **Virtual Column(가상 컬럼)**이 됩니다
+- Virtual Column은 데이터베이스에 저장되지 않고, 매번 계산됩니다
+- **성명과 연락처를 모두 확인**하여 동명이인이 있어도 정확한 사람을 찾습니다
+- 이 방식이 권장됩니다. QR 스캔 시 성명+연락처로 실시간 참가자를 찾습니다
 
 6. 스캔시간:
 - Type: DateTime
 - Initial value: ```NOW()```
 - Editable?: 체크 해제
+
+**📊 컬럼 유형 정리:**
+- **실제 컬럼 (Google Sheets에 저장됨):**
+  - ID, 스캔된성명, 스캔된연락처, 스캔시간
+  - 이 컬럼들은 **Initial value**에 수식을 입력하고 **App formula는 비워둠**
+
+- **가상 컬럼 (Virtual Column - 계산만 수행):**
+  - 참가자찾기
+  - **Initial value는 비우고**, **App formula에 수식 입력**
+
+**핵심 차이:**
+- `Initial value` = 데이터베이스에 값 저장 (실제 컬럼)
+- `App formula` = 실시간 계산만 (가상 컬럼, 저장 안 됨)
 
 ### 3. 동작(Actions) 만들기
 
@@ -332,8 +385,13 @@ function sendEmail(to, name, qrUrl, type) {
 - **Set these columns** 섹션에서 [+] 버튼을 눌러 다음을 추가:
   - Column: `출석시간` → Value: `NOW()`
   - Column: `출석여부` → Value: `"출석완료"`
-- **Display** 섹션을 펼쳐서:
-  - **Prominence**: `Do not display` 선택 (사용자 화면에 버튼 숨김)
+- **Position**: `Hide` 선택 (사용자 화면에 버튼 숨김)
+
+**Position 옵션 설명:**
+- Primary: 주요 버튼으로 표시
+- Prominent: 눈에 띄게 표시
+- Inline: 인라인으로 표시
+- Hide: 숨김 (자동화/백그라운드 액션용)
 
 #### Action 2: 자동 연결 (ScanLogs용)
 
@@ -346,24 +404,27 @@ function sendEmail(to, name, qrUrl, type) {
   - **Referenced Table**: `Form Responses 1`
   - **Referenced Rows**: `LIST([참가자찾기])`
   - **Referenced Action**: `출석상태변경` (위에서 만든 액션 선택)
-- **Display** 섹션:
-  - **Prominence**: `Do not display`
+- **Position**: `Hide` 선택
 
-**설명**: QR 코드 스캔 시 "성명|연락처" 데이터가 스캔되면, `참가자찾기` Ref 컬럼이 성명을 기준으로 Form Responses 1 테이블에서 해당 참가자를 찾아 출석 처리합니다.
+**설명**: QR 코드 스캔 시 "성명|연락처" 데이터가 스캔되면, `참가자찾기` Ref 컬럼이 **성명과 연락처를 모두 확인**하여 Form Responses 1 테이블에서 해당 참가자를 정확하게 찾아 출석 처리합니다. 동명이인이 있어도 연락처로 구분됩니다.
 
-### 4. 스캐너 화면 만들기 (왼쪽 메뉴 'UX')
+### 4. 스캐너 화면 설정하기 (왼쪽 메뉴 'UX')
+
+**참고**: AppSheet가 자동으로 생성한 `ScanLogs_Form` 뷰를 그대로 사용합니다. 원하면 View name을 "스캐너"로 변경할 수 있습니다.
+
 1. 왼쪽 메뉴에서 **UX** 탭 클릭
-2. **Views** 섹션에서 **New View** 클릭 (+ 버튼)
-3. 다음과 같이 설정:
-   - **View name**: `스캐너`
-   - **For this data**: `ScanLogs`
-   - **View type**: `form` (중요)
-4. 생성된 뷰를 클릭하여 설정 화면으로 들어갑니다
-5. **Behavior** 섹션을 펼칩니다:
+2. **Views** 섹션에서 **ScanLogs_Form** 뷰를 찾아 클릭
+3. (선택사항) View name을 "스캐너"로 변경 가능
+4. **Behavior** 섹션을 펼칩니다:
    - **Event Actions** 찾기
    - **Form Saved** 드롭다운에서 `자동출석트리거` 선택
-6. **Behavior** 섹션 내 **Navigation** 항목 설정:
-   - **Finish view**: `스캐너` (자기 자신을 선택 - 스캔 후 다시 스캔 화면으로 돌아옴)
+5. **Behavior** 섹션 내 **Navigation** 항목 설정:
+   - **Finish view**: 다음 중 선택
+     - **`ScanLogs_Form`** (권장): 스캔 후 다시 같은 Form 화면으로 돌아가 연속 스캔 가능
+     - **`Auto assign (Go Back)`**: 스캔 후 이전 화면(메인 메뉴 등)으로 자동 복귀
+   - View name을 "스캐너"로 변경했다면 Finish view 드롭다운에도 "스캐너"로 나타납니다
+
+   **권장**: 여러 참가자를 연속으로 스캔해야 하므로 `ScanLogs_Form` 선택을 추천합니다.
 
 **참고**: 2025년 AppSheet에서는 Auto save 옵션이 기본적으로 활성화되어 있으며, Form Saved 이벤트를 통해 저장 후 동작을 제어합니다.
 
@@ -377,11 +438,12 @@ function sendEmail(to, name, qrUrl, type) {
 ## 앱 사용 방법
 1. 상단 [Save] 버튼을 눌러 앱을 저장합니다.
 2. 스마트폰에 AppSheet 앱을 설치하고 로그인합니다.
-3. 만들어진 앱을 실행하고 [스캐너] 메뉴로 들어갑니다.
+3. 만들어진 앱을 실행하고 [ScanLogs_Form] 메뉴로 들어갑니다.
+   - View name을 "스캐너"로 변경했다면 [스캐너] 메뉴로 표시됩니다
 4. [스캔된성명] 입력창을 터치합니다.
 5. 입력창 내부의 **[QR 코드 아이콘]**을 누릅니다.
 6. 참가자의 QR 코드를 비추면:
    - "성명|연락처" 데이터가 자동으로 스캔됩니다
-   - 성명을 기준으로 참가자를 찾습니다
+   - 성명과 연락처를 모두 확인하여 정확한 참가자를 찾습니다
    - 자동으로 출석 처리가 완료됩니다
-   - 다시 스캐너 화면으로 돌아가 다음 참가자를 스캔할 수 있습니다
+   - 다시 스캔 화면으로 돌아가 다음 참가자를 스캔할 수 있습니다
