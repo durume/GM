@@ -273,27 +273,7 @@ function sendEmail(to, name, qrUrl, type) {
   - 설정 창 아래쪽 Other Properties 섹션 클릭 (펼치기)
   - Scannable 항목 체크 ✅
   - 상단 Done 클릭
-- [자동 추출] 설정:
-  - Initial value 수식: ```SPLIT([_THISROW].[스캔데이터], "|")[0]```
-  - (QR 코드의 "성명|연락처" 형식에서 성명 부분만 추출)
-
-4. 스캔된연락처:
-- Type: Phone
-- Initial value 수식: ```SPLIT([_THISROW].[스캔데이터], "|")[1]```
-- (QR 코드에서 연락처 부분 추출)
-
-5. 스캔시간:
-- Type: DateTime
-- Initial value: =NOW() 입력
-
-**중요**: 실제로는 QR 코드를 스캔할 때 "성명|연락처" 형식의 텍스트가 "스캔된성명" 컬럼에 입력됩니다. AppSheet의 Scannable 기능은 한 컬럼에만 적용되므로, 아래 방식으로 설정을 변경하겠습니다:
-
-**수정된 설정 (권장):**
-
-3. 스캔된성명:
-- Type: Text
-- [Scan] 기능 켜기 (위와 동일)
-- **이 컬럼에 "성명|연락처" 전체가 저장됩니다**
+- **이 컬럼에 QR 스캔 시 "성명|연락처" 전체가 저장됩니다**
 - [중복 방지] 설정:
   - 컬럼 편집 > Data Validity 섹션 클릭
   - Valid If 수식 입력:
@@ -318,21 +298,26 @@ function sendEmail(to, name, qrUrl, type) {
 
 4. 스캔된연락처:
 - Type: Text
-- Initial value 수식: ```SPLIT([스캔된성명], "|")[1]```
-- App formula 체크 ✅
-- (스캔된성명에서 연락처 부분만 추출)
+- Formula:
+  - Initial value 수식: ```SPLIT([스캔된성명], "|")[1]```
+  - App formula 체크 ✅
+- (스캔된성명 컬럼에서 "|" 뒤의 연락처 부분만 자동 추출)
+- Editable?: 체크 해제 (자동 계산 컬럼)
 
 5. 참가자찾기:
 - Type: Ref
 - Source table: Form Responses 1
-- Referenced column: 성명
-- App formula: ```SPLIT([스캔된성명], "|")[0]```
-- App formula 체크 ✅
-- Show?: 체크 해제 (숨김)
+- Referenced column: 성명 (Form Responses 1 테이블의 성명 컬럼)
+- Formula:
+  - Initial value: ```SPLIT([스캔된성명], "|")[0]```
+  - App formula 체크 ✅
+- (스캔된성명에서 "|" 앞의 성명만 추출하여 참가자 검색)
+- Show?: 체크 해제 (숨김 - 내부 로직용)
 
 6. 스캔시간:
 - Type: DateTime
-- Initial value: =NOW() 입력
+- Initial value: ```NOW()```
+- Editable?: 체크 해제
 
 ### 3. 동작(Actions) 만들기
 
