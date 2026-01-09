@@ -85,16 +85,25 @@ function onOpen() {
 function sendEventConfirmation(e) {
   try {
     const responses = e.values;
-    const userName = responses[NAME_INDEX]; 
+    const userName = responses[NAME_INDEX];
     const userEmail = responses[EMAIL_INDEX];
 
-    if (!userEmail) return;
+    // 이메일 유효성 검사
+    if (!userEmail || !userEmail.includes('@')) {
+      console.error("유효하지 않은 이메일: " + userEmail);
+      return;
+    }
 
     const qrImageUrl = generateQRCode(userEmail);
 
-    // 시트에 QR 저장
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    const row = e.range.getRow(); 
+    // 시트에 QR 저장 (getActiveSheet 대신 명시적으로 시트 이름 지정)
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form Responses 1");
+    if (!sheet) {
+      console.error("'Form Responses 1' 시트를 찾을 수 없습니다.");
+      return;
+    }
+
+    const row = e.range.getRow();
     sheet.getRange(row, QR_SAVE_COL).setValue(qrImageUrl);
 
     // 메일 발송
@@ -203,7 +212,19 @@ function sendEmail(to, name, qrUrl, type) {
 
 3. 트리거(자동 실행) 설정
 
-(기존에 설정하셨다면 그대로 두셔도 됩니다. 함수 이름이 같으므로 유지됩니다.)
+**[중요] 신청 시 자동으로 QR 코드와 확인 메일을 발송하려면 트리거 설정이 필수입니다.**
+
+1. Apps Script 편집기 화면에서 왼쪽 메뉴의 **시계 아이콘(⏰ 트리거)**을 클릭합니다.
+2. 오른쪽 하단의 **[+ 트리거 추가]** 버튼을 클릭합니다.
+3. 다음과 같이 설정합니다:
+   - **실행할 함수 선택**: `sendEventConfirmation`
+   - **실행할 배포 선택**: `Head`
+   - **이벤트 소스 선택**: `스프레드시트에서`
+   - **이벤트 유형 선택**: `양식 제출 시`
+4. **[저장]** 버튼을 클릭합니다.
+5. 처음 설정 시 Google 계정 권한 승인을 요청하면 승인합니다.
+
+**✅ 완료!** 이제 구글 폼으로 신청이 들어올 때마다 자동으로 QR 코드가 생성되고 확인 메일이 발송됩니다.
 
 ## 📱 3단계: 출석 체크 앱 만들기 (AppSheet)
 
@@ -252,37 +273,51 @@ function sendEmail(to, name, qrUrl, type) {
 - Type: DateTime
 - Initial value: =NOW() 입력
 
-### 3. 동작(Actions) 만들기 (왼쪽 메뉴 '번개' 아이콘)
+### 3. 동작(Actions) 만들기
+
+1. 왼쪽 메뉴에서 **Automation** 탭 클릭
+2. **Actions** 섹션으로 이동
+3. **New Action** 클릭 (+ 버튼)
 
 #### Action 1: 출석상태 변경 (참가자 명단용)
-- Action name: 출석상태변경
-- For a record of this table: Form Responses 1
-- Do this: ```Set the values of some columns in this row```
-- Set these columns:
-  - ```출석시간``` = ```NOW()```
-  - ```출석여부``` = ```"출석완료"```
-- Display (섹션 펼치기) > Prominence: ```Do not display``` (숨김)
+- **Action name**: `출석상태변경`
+- **For a record of this table**: `Form Responses 1`
+- **Do this**: `Data: set the values of some columns in this row` 선택
+- **Set these columns** 섹션에서 [+] 버튼을 눌러 다음을 추가:
+  - Column: `출석시간` → Value: `NOW()`
+  - Column: `출석여부` → Value: `"출석완료"`
+- **Display** 섹션을 펼쳐서:
+  - **Prominence**: `Do not display` 선택 (사용자 화면에 버튼 숨김)
 
 #### Action 2: 자동 연결 (ScanLogs용)
 
-- Action name: 자동출석트리거
-- For a record of this table: ScanLogs
-- Do this: Execute an action on a set of rows
-- Referenced Table: Form Responses 1
-- Referenced Rows: LIST([스캔된이메일])
-- Referenced Action: 출석상태변경 (위에서 만든 액션 선택)
-- Display > Prominence: Do not display
+다시 **New Action** 클릭하여 새 액션 생성:
 
-### 4. 스캐너 화면 만들기 (왼쪽 메뉴 'UX' 또는 'Views')
-1. Views 탭 > New View 클릭 (+ 버튼)
-2. View name: 스캐너
-3. For this data: ScanLogs
-4. View type: Form (중요)
-5. View Options 설정:
-- Auto save: 켜기 (ON)
-- Finish view: 스캐너 (자신을 선택 - 스캔 후 다시 스캔 화면으로 돌아옴)
-6. Behavior (섹션 펼치기) > Event Actions:
-- Form Saved: 자동출석트리거 선택
+- **Action name**: `자동출석트리거`
+- **For a record of this table**: `ScanLogs`
+- **Do this**: `Data: execute an action on a set of rows` 선택
+- 추가 설정 필드가 나타나면:
+  - **Referenced Table**: `Form Responses 1`
+  - **Referenced Rows**: `LIST([스캔된이메일])`
+  - **Referenced Action**: `출석상태변경` (위에서 만든 액션 선택)
+- **Display** 섹션:
+  - **Prominence**: `Do not display`
+
+### 4. 스캐너 화면 만들기 (왼쪽 메뉴 'UX')
+1. 왼쪽 메뉴에서 **UX** 탭 클릭
+2. **Views** 섹션에서 **New View** 클릭 (+ 버튼)
+3. 다음과 같이 설정:
+   - **View name**: `스캐너`
+   - **For this data**: `ScanLogs`
+   - **View type**: `form` (중요)
+4. 생성된 뷰를 클릭하여 설정 화면으로 들어갑니다
+5. **Behavior** 섹션을 펼칩니다:
+   - **Event Actions** 찾기
+   - **Form Saved** 드롭다운에서 `자동출석트리거` 선택
+6. **Behavior** 섹션 내 **Navigation** 항목 설정:
+   - **Finish view**: `스캐너` (자기 자신을 선택 - 스캔 후 다시 스캔 화면으로 돌아옴)
+
+**참고**: 2025년 AppSheet에서는 Auto save 옵션이 기본적으로 활성화되어 있으며, Form Saved 이벤트를 통해 저장 후 동작을 제어합니다.
 
 # ✅ 최종 사용 방법
 1. 상단 [Save] 버튼을 눌러 앱을 저장합니다.
