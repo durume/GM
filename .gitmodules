@@ -1,0 +1,3 @@
+[submodule "gm-ai-hub-app"]
+	path = gm-ai-hub-app
+	url = https://github.com/parandurume/gm-ai-hub-installable.git
