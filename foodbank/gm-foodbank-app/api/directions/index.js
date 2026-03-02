@@ -1,9 +1,20 @@
+// Allowed origins for CORS
+const ALLOWED_ORIGINS = [
+    'https://durume.github.io',
+    'http://localhost:5173',
+    'http://localhost:4173'
+];
+
 module.exports = async function (context, req) {
+    // Determine the origin
+    const origin = req.headers.origin || req.headers.Origin || '';
+    const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+
     // Set CORS headers
     context.res = {
         headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Origin': allowedOrigin,
             'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
             'Access-Control-Allow-Headers': 'Content-Type'
         }
