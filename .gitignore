@@ -46,3 +46,7 @@ coverage/
 *.tmp
 *.temp
 ~$*
+
+# Testing Projects
+local-mcp-server-antigravity/
+local-mcp-servers/

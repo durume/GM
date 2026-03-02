@@ -33,23 +33,34 @@ const KakaoMap = ({ donors, kakaoApiKey, apiBaseUrl }: KakaoMapProps) => {
 
   // Load Kakao Maps SDK
   useEffect(() => {
+    console.log('KakaoMap: Checking if Kakao SDK is already loaded...');
+    console.log('KakaoMap: window.kakao exists?', typeof window.kakao !== 'undefined');
+    console.log('KakaoMap: API Key:', kakaoApiKey);
+
     if (window.kakao && window.kakao.maps) {
+      console.log('KakaoMap: SDK already loaded, setting isMapLoaded to true');
       setIsMapLoaded(true);
       return;
     }
 
+    console.log('KakaoMap: Loading Kakao Maps SDK script...');
     const script = document.createElement('script');
     script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoApiKey}&autoload=false`;
     script.async = true;
 
     script.onload = () => {
+      console.log('KakaoMap: Script loaded, calling kakao.maps.load()...');
       window.kakao.maps.load(() => {
+        console.log('KakaoMap: Kakao Maps library loaded successfully');
         setIsMapLoaded(true);
       });
     };
 
     script.onerror = (error) => {
-      console.error('KakaoMap: Failed to load Kakao Maps SDK. Check API key authorization for this domain.');
+      console.error('KakaoMap: Failed to load script:', error);
+      console.error('KakaoMap: Script URL:', script.src);
+      console.error('KakaoMap: This usually means the API key is not authorized for this domain (localhost)');
+      console.error('KakaoMap: Please check Kakao Developers Console > Your App > Platform > Web Platform');
     };
 
     document.head.appendChild(script);
@@ -63,10 +74,16 @@ const KakaoMap = ({ donors, kakaoApiKey, apiBaseUrl }: KakaoMapProps) => {
 
   // Initialize map (only once when map loads)
   useEffect(() => {
+    console.log('KakaoMap: Initialize map effect triggered');
+    console.log('KakaoMap: isMapLoaded:', isMapLoaded);
+    console.log('KakaoMap: mapContainer.current:', mapContainer.current);
+
     if (!isMapLoaded || !mapContainer.current || mapRef.current) {
+      console.log('KakaoMap: Skipping map initialization - conditions not met or map already exists');
       return;
     }
 
+    console.log('KakaoMap: Creating map instance...');
     const options = {
       center: new window.kakao.maps.LatLng(GWANGMYEONG_CENTER.lat, GWANGMYEONG_CENTER.lng),
       level: 5
@@ -74,6 +91,7 @@ const KakaoMap = ({ donors, kakaoApiKey, apiBaseUrl }: KakaoMapProps) => {
 
     const map = new window.kakao.maps.Map(mapContainer.current, options);
     mapRef.current = map;
+    console.log('KakaoMap: Map instance created successfully');
 
     // Add markers
     validDonors.forEach(donor => {
@@ -203,8 +221,11 @@ const KakaoMap = ({ donors, kakaoApiKey, apiBaseUrl }: KakaoMapProps) => {
     try {
       // Call our secure Azure Function proxy instead of Kakao API directly
       const url = `${apiBaseUrl}/directions?origin=${userLocation.lng},${userLocation.lat}&destination=${selectedDonor.coordinates.lng},${selectedDonor.coordinates.lat}`;
+      console.log('KakaoMap: Calling directions API:', url);
 
       const response = await fetch(url);
+      console.log('KakaoMap: Response status:', response.status);
+      console.log('KakaoMap: Response headers:', response.headers.get('content-type'));
 
       if (!response.ok) {
         let errorData;
@@ -225,6 +246,7 @@ const KakaoMap = ({ donors, kakaoApiKey, apiBaseUrl }: KakaoMapProps) => {
       }
 
       const data = await response.json();
+      console.log('KakaoMap: Route data received:', data);
 
       if (data.routes && data.routes.length > 0) {
         const route = data.routes[0];
