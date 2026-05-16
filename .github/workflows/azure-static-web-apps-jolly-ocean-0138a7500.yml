@@ -4,10 +4,16 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'foodbank/**'
+      - '.github/workflows/azure-static-web-apps-jolly-ocean-0138a7500.yml'
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
       - main
+    paths:
+      - 'foodbank/**'
+      - '.github/workflows/azure-static-web-apps-jolly-ocean-0138a7500.yml'
 
 jobs:
   build_and_deploy_job:
