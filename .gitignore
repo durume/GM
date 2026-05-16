@@ -50,3 +50,6 @@ coverage/
 # Testing Projects
 local-mcp-server-antigravity/
 local-mcp-servers/
+
+# customized survey page
+customized-survey-page/
